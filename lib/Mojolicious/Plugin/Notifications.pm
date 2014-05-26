@@ -16,7 +16,7 @@ sub register {
 
   # Load parameter from Config file
   if (my $config_param = $mojo->config('Notifications')) {
-    $param = { %$config_param, %$param };
+    $param = { %$param, %$config_param };
   };
 
   unless (keys %$param) {
@@ -143,7 +143,7 @@ Mojolicious::Plugin::Notifications - Event Notifications for your Users
   $c->notify(warn => 'Something went wrong');
 
   # Render notifications in templates ...
-  %= notifications 'humane'
+  %= notifications 'humane';
 
   # ... or in any other responses
   my $json = { text => 'That\'s my response' };
@@ -175,10 +175,11 @@ Called when registering the plugin.
 
 Accepts the registration of multiple L<engines|/ENGINES> for notification
 responses. Configurations of the engines can be passed as hash
-references. If no configuration should be passed, add a scalar value.
+references. If no configuration should be passed, just pass a scalar value.
 
-All parameters can be set either on registration or
-as part of the configuration file with the key C<Notifications>.
+All parameters can be set either as part of the configuration
+file with the key C<Notifications> or on registration
+(that can be overwritten by configuration).
 
 
 =head1 HELPERS
@@ -189,14 +190,14 @@ as part of the configuration file with the key C<Notifications>.
   $c->notify(error => { timeout => 4000 } => 'Something went wrong');
 
 Notify the user about an event.
-Expects an event type as a string and a message.
-In case a notification engine supports further refinement,
-these can be passed in a hash reference passed as a second parameter.
+Expects an event type and a message as strings.
+In case a notification engine supports further refinements,
+these can be passed in a hash reference as a second parameter.
 
 
 =head2 notifications
 
-  %= notifications humane => qw/warn error success/;
+  %= notifications 'humane' => [qw/warn error success/];
   %= notifications 'html';
 
   $c->render(json => $c->notifications(json => {
@@ -205,7 +206,7 @@ these can be passed in a hash reference passed as a second parameter.
 
 Serve notifications to your user based on an engine.
 The engine's name has to be passed as the first parameter
-and the engine has to be L<registered|/register>.
+and the engine has to be L<registered|/register> in advance.
 Notifications won't be invoked in case no notifications are
 in the queue and no further engine parameters are passed.
 Engine parameters are documented in the respective plugins.
@@ -215,14 +216,15 @@ Engine parameters are documented in the respective plugins.
 
 =head2 Bundled engines
 
+The following engines are bundled with this plugin:
 L<Humane|Mojolicious::Plugin::Notifications::Humane>,
-L<HTML|Mojolicious::Plugin::Notifications::HTML>,
+L<HTML|Mojolicious::Plugin::Notifications::HTML>, and
 L<JSON|Mojolicious::Plugin::Notifications::JSON>.
 
 
 =head2 Writing your own engine
 
-...
+Todo: ...
 
 
 =head1 AVAILABILITY
@@ -235,7 +237,7 @@ L<JSON|Mojolicious::Plugin::Notifications::JSON>.
 Copyright (C) 2014, L<Nils Diewald|http://nils-diewald.de/>.
 
 Most of the code was done at the
-L<Mojoconf2014|http://www.mojoconf.org/mojo2014/> hackathon.
+L<Mojoconf 2014|http://www.mojoconf.org/mojo2014/> hackathon.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.
