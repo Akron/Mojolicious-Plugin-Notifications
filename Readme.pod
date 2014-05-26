@@ -1,0 +1,121 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Mojolicious::Plugin::Notifications - Event Notifications for your Users
+
+
+=head1 SYNOPSIS
+
+  # Register the plugin and several engines
+  plugin Notifications => {
+    Humane => {
+      base_class => 'libnotify'
+    },
+    JSON => 1
+  };
+
+  # Add notification messages in controllers
+  $c->notify(warn => 'Something went wrong');
+
+  # Render notifications in templates ...
+  %= notifications 'humane'
+
+  # ... or in any other responses
+  my $json = { text => 'That\'s my response' };
+  $c->render(json => $c->notifications(json => $json));
+
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Plugin::Notifications> supports several engines
+to notify users on events. Notifications will survive redirects
+and can be served depending on response types.
+
+
+=head1 METHODS
+
+L<Mojolicious::Plugin::Notifications> inherits all methods
+from L<Mojolicious::Plugin> and implements the following new one.
+
+=head2 register
+
+  plugin Notifications => {
+    Humane => {
+      base_class => 'libnotify'
+    },
+    HTML => 1
+  };
+
+Called when registering the plugin.
+
+Accepts the registration of multiple L<engines|/ENGINES> for notification
+responses. Configurations of the engines can be passed as hash
+references. If no configuration should be passed, add a scalar value.
+
+All parameters can be set either on registration or
+as part of the configuration file with the key C<Notifications>.
+
+
+=head1 HELPERS
+
+=head2 notify
+
+  $c->notify(error => 'Something went wrong');1
+  $c->notify(error => { timeout => 4000 } => 'Something went wrong');
+
+Notify the user about an event.
+Expects an event type as a string and a message.
+In case a notification engine supports further refinement,
+these can be passed in a hash reference passed as a second parameter.
+
+
+=head2 notifications
+
+  %= notifications humane => qw/warn error success/;
+  %= notifications 'html';
+
+  $c->render(json => $c->notifications(json => {
+    text => 'My message'
+  }));
+
+Serve notifications to your user based on an engine.
+The engine's name has to be passed as the first parameter
+and the engine has to be L<registered|/register>.
+Notifications won't be invoked in case no notifications are
+in the queue and no further engine parameters are passed.
+Engine parameters are documented in the respective plugins.
+
+
+=head1 ENGINES
+
+=head2 Bundled engines
+
+L<Humane|Mojolicious::Plugin::Notifications::Humane>,
+L<HTML|Mojolicious::Plugin::Notifications::HTML>,
+L<JSON|Mojolicious::Plugin::Notifications::JSON>.
+
+
+=head2 Writing your own engine
+
+...
+
+
+=head1 AVAILABILITY
+
+  https://github.com/Akron/Mojolicious-Plugin-Notifications
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014, L<Nils Diewald|http://nils-diewald.de/>.
+
+Most of the code was done at the
+L<Mojoconf2014|http://www.mojoconf.org/mojo2014/> hackathon.
+
+This program is free software, you can redistribute it
+and/or modify it under the terms of the Artistic License version 2.0.
+
+=cut
