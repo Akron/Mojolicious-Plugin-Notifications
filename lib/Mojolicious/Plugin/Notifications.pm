@@ -4,7 +4,7 @@ use Mojo::Util qw/camelize/;
 
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 # Register plugin
 sub register {
@@ -193,7 +193,9 @@ Notify the user about an event.
 Expects an event type and a message as strings.
 In case a notification engine supports further refinements,
 these can be passed in a hash reference as a second parameter.
-
+Event types are free and its treatment is up to the engines,
+however notifications of the type C<debug> will only be passed in
+development mode.
 
 =head2 notifications
 
@@ -217,14 +219,32 @@ Engine parameters are documented in the respective plugins.
 =head2 Bundled engines
 
 The following engines are bundled with this plugin:
-L<Humane|Mojolicious::Plugin::Notifications::Humane>,
+L<Humane.js|Mojolicious::Plugin::Notifications::Humane>,
 L<HTML|Mojolicious::Plugin::Notifications::HTML>, and
 L<JSON|Mojolicious::Plugin::Notifications::JSON>.
 
 
 =head2 Writing your own engine
 
-Todo: ...
+A notification engine is a simple L<Mojolicious::Plugin>, having a C<register> method
+and a C<notifications> method.
+The register method is called when the engine is loaded and can be used to establish
+further configurations, helpers, hooks etc. There is no need to define anything in
+the method.
+
+The C<notifications> method will be called whenever notifications are rendered.
+The first parameter passed is the plugin object, the second parameter is the current
+controller object and the third parameter is an array reference containing all
+notifications as array references. The first element of the notification is the
+notification type, the last element is the message. An optional second element may
+contain further parameters in a hash reference.
+
+All parameters passed to the L<notifications> helper following the engine's name are
+appended.
+
+The L<bundled engines|/Bundled engines> can serve as good examples on how
+to write an engine, especially the simple
+L<HTML|Mojolicious::Plugin::Notifications::HTML> engine.
 
 
 =head1 AVAILABILITY
@@ -236,7 +256,7 @@ Todo: ...
 
 Copyright (C) 2014, L<Nils Diewald|http://nils-diewald.de/>.
 
-Most of the code was done at the
+Part of the code was written at the
 L<Mojoconf 2014|http://www.mojoconf.org/mojo2014/> hackathon.
 
 This program is free software, you can redistribute it

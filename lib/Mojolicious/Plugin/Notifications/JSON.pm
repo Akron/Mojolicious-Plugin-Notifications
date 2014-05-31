@@ -61,7 +61,9 @@ Mojolicious::Plugin::Notifications::JSON - Event Notification in JSON
 =head1 SYNOPSIS
 
   # Register the engine
-  plugin Notifications => { JSON => 1 };
+  plugin Notifications => {
+    JSON => 1
+  };
 
   # In the controller
   $c->render(json => $c->notifications(json => $json));
@@ -71,11 +73,14 @@ Mojolicious::Plugin::Notifications::JSON - Event Notification in JSON
 
 This plugin is a simple notification engine for JSON.
 
-If this does not suit your needs, you can easily
+If it does not suit your needs, you can easily
 L<write your own engine|Mojolicious::Plugin::Notifications/Writing your own engine>.
 
 
 =head1 METHODS
+
+L<Mojolicious::Plugin::Notifications::JSON> inherits all methods
+from L<Mojolicious::Plugin> and implements the following new one.
 
 =head2 register
 
@@ -104,7 +109,7 @@ Defaults to C<notifications>.
 
 =head2 notify
 
-See L<notify|Mojolicious::Plugin::Notifications/notify>.
+See the base L<notify|Mojolicious::Plugin::Notifications/notify> helper.
 
 
 =head2 notifications
@@ -116,9 +121,9 @@ Merge notifications into your JSON response.
 
 In case JSON is an object, it will inject an attribute
 that points to an array reference containing the notifications.
-If the JSON object is a array, an object is appended with one attribute
+If the JSON is an array, an object is appended with one attribute
 that points to an array reference containing the notifications.
-If the JSON object is empty, an object will be created an attribute
+If the JSON is empty, an object will be created with one attribute
 that points to an array reference containing the notifications.
 
 If the JSON is not of one of the descripted types, it's returned

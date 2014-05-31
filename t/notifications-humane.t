@@ -2,7 +2,7 @@
 use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
-$|++;
+
 use lib ('lib', '../lib');
 
 my $t = Test::Mojo->new;
@@ -18,11 +18,13 @@ $co->app($app);
 
 like($co->notifications(humane => [qw/warn/]), qr/humane-libnotify-warn/, 'No center');
 
-$co->notify(warn => 'test');
+$co->notify(warn => 'warning');
 $co->notify(error => q/That's an error/);
-$co->notify(success => q/That's <an error/);
+$co->notify(success => q/That's <a success/);
 
-like($co->notifications('humane'), qr/warn.+?error.+?succes/s, 'Notification is fine');
+my $notes = $co->notifications('humane');
+like($notes, qr/warn.+?error.+?succes/s, 'Notification is fine');
+like($notes, qr/noscript/s, 'Notification is fine');
 ok(!$co->notifications('humane'), 'No notifications');
 
 # $c->include_notification_center

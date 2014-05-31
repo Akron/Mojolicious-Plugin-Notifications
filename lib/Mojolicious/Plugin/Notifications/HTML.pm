@@ -4,7 +4,7 @@ use Mojo::Collection 'c';
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/xml_escape/;
 
-# Nothing to register
+# Nothing to register - but establishes the plugin
 sub register {};
 
 
@@ -19,7 +19,7 @@ sub notifications {
 	"</div>\n";
   };
 
-  return b $html;
+  return b($html);
 };
 
 
@@ -40,21 +40,26 @@ Mojolicious::Plugin::Notifications::HTML - Event Notification using HTML
 =head1 SYNOPSIS
 
   # Register the engine
-  plugin Notifications => { HTML => 1 };
+  plugin Notifications => {
+    HTML => 1
+  };
 
   # In the template
-  %= notifications
+  %= notifications 'html'
 
 
 =head1 DESCRIPTION
 
 This plugin is a simple notification engine for HTML.
 
-If this does not suit your needs, you can easily
+If it does not suit your needs, you can easily
 L<write your own engine|Mojolicious::Plugin::Notifications/Writing your own engine>.
 
 
 =head1 METHODS
+
+L<Mojolicious::Plugin::Notifications::HTML> inherits all methods
+from L<Mojolicious::Plugin> and implements the following new one.
 
 =head2 register
 
@@ -62,14 +67,14 @@ L<write your own engine|Mojolicious::Plugin::Notifications/Writing your own engi
     HTML => 1
   };
 
-Called when registering the main plugin.
+Called when registering the main plugin. No parameters are necessary.
 
 
 =head1 HELPERS
 
 =head2 notify
 
-See L<notify|Mojolicious::Plugin::Notifications/notify>.
+See the base L<notify|Mojolicious::Plugin::Notifications/notify> helper.
 
 
 =head2 notifications

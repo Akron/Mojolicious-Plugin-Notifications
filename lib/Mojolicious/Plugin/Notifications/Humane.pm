@@ -1,6 +1,7 @@
 package Mojolicious::Plugin::Notifications::Humane;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
+use Mojo::Util qw/xml_escape/;
 use Mojo::JSON;
 use File::Spec;
 use File::Basename;
@@ -29,6 +30,8 @@ sub register {
 sub notifications {
   my ($self, $c, $notify_array, @post) = @_;
 
+  state $path = '/humane/';
+
   my $types = shift @post if ref $post[0] && ref $post[0] eq 'ARRAY';
 
   return unless @$notify_array || @$types;
@@ -42,17 +45,19 @@ sub notifications {
 
   my $js = '';
   unless ($rule{-no_include}) {
-    $js .= $c->javascript('humane.min.js');
+    $js .= $c->javascript($path . 'humane.min.js');
 
     unless ($rule{-no_css}) {
-      $js .= $c->stylesheet($base_class . '.css');;
+      $js .= $c->stylesheet($path . $base_class . '.css');;
     };
   };
 
   # Start JavaScript snippet
-  $js .= qq{<script>\n} .
+  $js .= qq{<script><![CDATA[\n} .
     qq!var notify=humane.create({baseCls:'humane-$base_class',timeout:! .
       $self->base_timeout . ",clickToClose:true});\n";
+
+  my $noscript = "<noscript>";
 
   my ($log, %notify) = ('');
 
@@ -64,6 +69,10 @@ sub notifications {
     $log .= '.' . $_->[0] . '(' . $json->encode($_->[-1]);
     $log .= ', ' . $json->encode($_->[1]) if scalar @{$_} == 3;
     $log .= ')';
+
+    $noscript .= qq{<div class="notify notify-} . $_->[0] . '">' .
+      xml_escape($_->[-1]) .
+	"</div>\n";
   };
   $log = "notify$log;\n" if $log;
 
@@ -72,7 +81,7 @@ sub notifications {
     $js .= "notify.$_=notify.spawn({addnCls:'humane-$base_class-$_'});\n";
   };
 
-  return b($js . $log . '</script>');
+  return b($js . $log . "]]></script>\n" . $noscript . '</noscript>');
 };
 
 
@@ -93,10 +102,14 @@ Mojolicious::Plugin::Notifications::Humane - Event notification using Humane.js
 =head1 SYNOPSIS
 
   # Register the engine
-  plugin Notifications => { HTML => 1 };
+  plugin Notifications => {
+    Humane => {
+      base_class => 'libnotify'
+    }
+  };
 
   # In the template
-  %= notifications
+  %= notifications 'Humane'
 
 
 =head1 DESCRIPTION
@@ -109,10 +122,13 @@ L<write your own engine|Mojolicious::Plugin::Notifications/Writing your own engi
 
 If you want to use Humane.js without L<Mojolicious::Plugin::Notifications>,
 you should have a look at L<Mojolicious::Plugin::Humane>,
-which was the oriinal inspiration for this plugin.
+which was the original inspiration for this plugin.
 
 
 =head1 METHODS
+
+L<Mojolicious::Plugin::Notifications::Humane> inherits all methods
+from L<Mojolicious::Plugin> and implements the following new one.
 
 =head2 register
 
@@ -139,7 +155,7 @@ for more information.
 
 =item B<base_timeout>
 
-The base timeout for all humane notifications. Defaults to C>3000 ms>.
+The base timeout for all humane notifications. Defaults to C<3000 ms>.
 Set to C<0> for no timeout.
 
 =back
@@ -185,6 +201,10 @@ pass this as a string attribute.
 If you don't want to include the javascript and css assets for Humane.js,
 append C<-no_include>. If you just don't want to render the
 stylesheet tag for the inclusion of the CSS, append C<-no_css>.
+
+All notifications are also rendered in a C<E<lt>noscript /E<gt>> tag,
+following the notation described in the
+L<HTML|Mojolicious::Plugin::Notifications::HTML> engine.
 
 
 =head1 SEE ALSO
