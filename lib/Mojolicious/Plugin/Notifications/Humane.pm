@@ -53,7 +53,7 @@ sub notifications {
   };
 
   # Start JavaScript snippet
-  $js .= qq{<script><![CDATA[\n} .
+  $js .= qq{<script>//<![CDATA[\n} .
     qq!var notify=humane.create({baseCls:'humane-$base_class',timeout:! .
       $self->base_timeout . ",clickToClose:true});\n";
 
@@ -81,7 +81,7 @@ sub notifications {
     $js .= "notify.$_=notify.spawn({addnCls:'humane-$base_class-$_'});\n";
   };
 
-  return b($js . $log . "]]></script>\n" . $noscript . '</noscript>');
+  return b($js . $log . "//]]>\n</script>\n" . $noscript . '</noscript>');
 };
 
 
