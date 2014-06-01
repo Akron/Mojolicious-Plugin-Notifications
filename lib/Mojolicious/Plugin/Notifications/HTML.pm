@@ -34,7 +34,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Notifications::HTML - Event Notification using HTML
+Mojolicious::Plugin::Notifications::HTML - Event Notifications using HTML
 
 
 =head1 SYNOPSIS

@@ -4,7 +4,7 @@ use Mojo::Util qw/camelize/;
 
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 # Register plugin
 sub register {
@@ -219,9 +219,10 @@ Engine parameters are documented in the respective plugins.
 =head2 Bundled engines
 
 The following engines are bundled with this plugin:
-L<Humane.js|Mojolicious::Plugin::Notifications::Humane>,
-L<HTML|Mojolicious::Plugin::Notifications::HTML>, and
-L<JSON|Mojolicious::Plugin::Notifications::JSON>.
+L<HTML|Mojolicious::Plugin::Notifications::HTML>,
+L<JSON|Mojolicious::Plugin::Notifications::JSON>,
+L<Humane.js|Mojolicious::Plugin::Notifications::Humane>, and
+L<Alertify.js|Mojolicious::Plugin::Notifications::Alertify>,
 
 
 =head2 Writing your own engine

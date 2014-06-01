@@ -55,7 +55,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Notifications::JSON - Event Notification in JSON
+Mojolicious::Plugin::Notifications::JSON - Event Notifications in JSON
 
 
 =head1 SYNOPSIS

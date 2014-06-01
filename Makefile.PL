@@ -18,7 +18,9 @@ WriteMakefile(
   },
   LICENSE      => 'artistic_2',
   META_MERGE   => {
-    requires  => {perl => '5.010001'},
+    requires  => {
+      perl => '5.010001'
+    },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
       repository  => 'https://github.com/Akron/Mojolicious-Plugin-Notifications'

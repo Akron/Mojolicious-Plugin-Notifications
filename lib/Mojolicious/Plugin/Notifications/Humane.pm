@@ -48,7 +48,7 @@ sub notifications {
     $js .= $c->javascript($path . 'humane.min.js');
 
     unless ($rule{-no_css}) {
-      $js .= $c->stylesheet($path . $base_class . '.css');;
+      $js .= $c->stylesheet($path . $base_class . '.css');
     };
   };
 
@@ -96,7 +96,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Notifications::Humane - Event notification using Humane.js
+Mojolicious::Plugin::Notifications::Humane - Event notifications using Humane.js
 
 
 =head1 SYNOPSIS
@@ -220,7 +220,7 @@ L<Mojolicious::Plugin::Humane>.
 
 =head1 COPYRIGHT AND LICENSE
 
-=head2 Mojolicious::Plugin::Humane
+=head2 Mojolicious::Plugin::Notifications::Humane
 
 Copyright (C) 2014, L<Nils Diewald|http://nils-diewald.de/>.
 
