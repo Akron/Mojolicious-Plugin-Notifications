@@ -59,5 +59,8 @@ like($string, qr/\"That\'s an error\", \{\"timeout\"\:2000\}/, 'JSON');
 like($string, qr/success\(\"That\'s \<an error\", \{\"clickToClose\"\:true\}/, 'JSON');
 like($string, qr/(?:"timeout":23,|,"timeout":23)/, 'JSON');
 
+is (($co->notifications->scripts)[0], '/humane/humane.min.js', 'Javascripts');
+is (($co->notifications->styles)[0], '/humane/libnotify.css', 'Styles');
+
 done_testing;
 __END__

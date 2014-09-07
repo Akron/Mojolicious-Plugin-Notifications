@@ -1,3 +1,8 @@
+0.04 2014-09-07
+        - Added experimental AssetPack support.
+	- Added abstract M::P::N::Engine package.
+	- Added M::P::N::Assets package.
+
 0.03 2014-06-01
         - Documentation cleanup.
         - Added Alertify engine.

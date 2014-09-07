@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Notifications::Alertify;
-use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/xml_escape quote/;
 use Mojo::JSON;
@@ -12,6 +12,7 @@ has json => sub {
 
 has [qw/base_class base_timeout/];
 
+state $path = '/alertify/';
 
 # Register plugin
 sub register {
@@ -21,6 +22,12 @@ sub register {
   $plugin->base_class(   $param->{base_class}   // 'default' );
   $plugin->base_timeout( $param->{base_timeout} // 5000 );
 
+  $plugin->scripts($path . 'alertify.min.js');
+  $plugin->styles(
+    $path . 'alertify.core.css',
+    $path . 'alertify.' . $plugin->base_class . '.css'
+  );
+
   # Add static path to JavaScript
   push @{$mojo->static->paths},
     File::Spec->catdir( File::Basename::dirname(__FILE__), 'Alertify' );
@@ -29,24 +36,17 @@ sub register {
 
 # Notification method
 sub notifications {
-  my ($self, $c, $notify_array, @post) = @_;
-
-  state $path = '/alertify/';
-
-  my %rule;
-  while ($post[-1] && index($post[-1], '-') == 0) {
-    $rule{pop @post} = 1;
-  };
+  my ($self, $c, $notify_array, $rule, @post) = @_;
 
   my $theme = shift @post // $self->base_class;
 
   my $js = '';
-  unless ($rule{-no_include}) {
-    $js .= $c->javascript($path . 'alertify.min.js');
+  unless ($rule->{no_include}) {
+    $js .= $c->javascript( $self->scripts );
 
-    unless ($rule{-no_css}) {
-      $js .= $c->stylesheet($path . 'alertify.core.css');
-      $js .= $c->stylesheet($path . 'alertify.' . $theme . '.css');
+    unless ($rule->{no_css}) {
+      $js .= $c->stylesheet( ($self->styles)[0] );
+      $js .= $c->stylesheet( $path . 'alertify.' . $theme . '.css');
     };
   };
 
@@ -110,13 +110,14 @@ This plugin is a notification engine using
 L<Alertify.js|http://fabien-d.github.io/alertify.js/>.
 
 If this does not suit your needs, you can easily
-L<write your own engine|Mojolicious::Plugin::Notifications/Writing your own engine>.
+L<write your own engine|Mojolicious::Plugin::Notifications::Engine/Writing your own engine>.
 
 
 =head1 METHODS
 
 L<Mojolicious::Plugin::Notifications::Alertify> inherits all methods
-from L<Mojolicious::Plugin> and implements the following new one.
+from L<Mojolicious::Plugin::Notifications::Engine> and implements or overrides
+the following.
 
 =head2 register
 
@@ -178,7 +179,7 @@ Include alertify notifications in your template.
 If you want to use a class different to the defined base class, you can
 pass this as a string attribute.
 
-If you don't want to include the javascript and css assets for Alertify.js,
+If you don't want to include the javascript and css assets for C<Alertify.js>,
 append C<-no_include>. If you just don't want to render the
 stylesheet tag for the inclusion of the CSS, append C<-no_css>.
 

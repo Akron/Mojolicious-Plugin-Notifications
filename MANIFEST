@@ -1,4 +1,6 @@
 lib/Mojolicious/Plugin/Notifications.pm
+lib/Mojolicious/Plugin/Notifications/Engine.pm
+lib/Mojolicious/Plugin/Notifications/Assets.pm
 lib/Mojolicious/Plugin/Notifications/Humane.pm
 lib/Mojolicious/Plugin/Notifications/Humane/humane/bigbox.css
 lib/Mojolicious/Plugin/Notifications/Humane/humane/boldlight.css
@@ -19,6 +21,7 @@ t/notifications.t
 t/notifications-alertify.t
 t/notifications-humane.t
 t/notifications-json.t
+t/notifications-mix.t
 Changes
 MANIFEST
 LICENSE

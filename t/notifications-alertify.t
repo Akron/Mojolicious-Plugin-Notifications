@@ -59,5 +59,9 @@ like($string, qr/\"That\'s an error\",\"error\",2000/, 'JSON');
 like($string, qr/log\(\"That\'s \<an error\",\"success\"/, 'JSON');
 like($string, qr/log\(\"That\'s \<an error\",\"trial\",23/, 'JSON');
 
+is(($co->notifications->scripts)[0], '/alertify/alertify.min.js', 'Javascripts');
+is(($co->notifications->styles)[0], '/alertify/alertify.core.css', 'Styles');
+is(($co->notifications->styles)[1], '/alertify/alertify.default.css', 'Styles');
+
 done_testing;
 __END__

@@ -78,6 +78,9 @@ $t->get_ok('/damn_array')
   ->json_has('/3/notifications/0' => [warn => 'Yeah1'])
   ->json_has('/3/notifications/0' => [error => 'Yeah2']);
 
+is ($co->notifications->scripts, (), 'Javascripts');
+is ($co->notifications->styles, (), 'Styles');
+
 done_testing;
 
 __END__

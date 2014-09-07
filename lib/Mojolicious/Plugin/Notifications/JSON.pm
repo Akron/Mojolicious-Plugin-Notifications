@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Notifications::JSON;
-use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 
 has key => 'notifications';
 
@@ -12,7 +12,7 @@ sub register {
 
 # Notification method
 sub notifications {
-  my ($self, $c, $notify_array, $json, %param) = @_;
+  my ($self, $c, $notify_array, $rule, $json, %param) = @_;
 
   my $key = $param{key} // $self->key;
 
@@ -74,13 +74,15 @@ Mojolicious::Plugin::Notifications::JSON - Event Notifications in JSON
 This plugin is a simple notification engine for JSON.
 
 If it does not suit your needs, you can easily
-L<write your own engine|Mojolicious::Plugin::Notifications/Writing your own engine>.
+L<write your own engine|Mojolicious::Plugin::Notifications::Engine/Writing your own engine>.
 
 
 =head1 METHODS
 
 L<Mojolicious::Plugin::Notifications::JSON> inherits all methods
-from L<Mojolicious::Plugin> and implements the following new one.
+from L<Mojolicious::Plugin::Notifications::Engine> and implements
+the following new one.
+
 
 =head2 register
 

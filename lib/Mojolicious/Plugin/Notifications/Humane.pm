@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Notifications::Humane;
-use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/xml_escape/;
 use Mojo::JSON;
@@ -12,6 +12,8 @@ has json => sub {
 
 has [qw/base_class base_timeout/];
 
+state $path = '/humane/';
+
 # Register plugin
 sub register {
   my ($plugin, $mojo, $param) = @_;
@@ -19,6 +21,9 @@ sub register {
   # Set config
   $plugin->base_class(   $param->{base_class}   // 'libnotify' );
   $plugin->base_timeout( $param->{base_timeout} // 3000 );
+
+  $plugin->scripts( $path . 'humane.min.js');
+  $plugin->styles(  $path . $plugin->base_class . '.css');
 
   # Add static path to JavaScript
   push @{$mojo->static->paths},
@@ -28,26 +33,19 @@ sub register {
 
 # Notification method
 sub notifications {
-  my ($self, $c, $notify_array, @post) = @_;
-
-  state $path = '/humane/';
+  my ($self, $c, $notify_array, $rule, @post) = @_;
 
   my $types = shift @post if ref $post[0] && ref $post[0] eq 'ARRAY';
 
   return unless @$notify_array || @$types;
 
-  my %rule;
-  while ($post[-1] && index($post[-1], '-') == 0) {
-    $rule{pop @post} = 1;
-  };
-
   my $base_class = shift @post // $self->base_class;
 
   my $js = '';
-  unless ($rule{-no_include}) {
-    $js .= $c->javascript($path . 'humane.min.js');
+  unless ($rule->{no_include}) {
+    $js .= $c->javascript($self->scripts);
 
-    unless ($rule{-no_css}) {
+    unless ($rule->{no_css}) {
       $js .= $c->stylesheet($path . $base_class . '.css');
     };
   };
@@ -96,7 +94,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Notifications::Humane - Event notifications using Humane.js
+Mojolicious::Plugin::Notifications::Humane - Event Notifications using Humane.js
 
 
 =head1 SYNOPSIS
@@ -118,7 +116,7 @@ This plugin is a notification engine using
 L<Humane.js|http://wavded.github.io/humane-js/>.
 
 If this does not suit your needs, you can easily
-L<write your own engine|Mojolicious::Plugin::Notifications/Writing your own engine>.
+L<write your own engine|Mojolicious::Plugin::Notifications::Engine/Writing your own engine>.
 
 If you want to use Humane.js without L<Mojolicious::Plugin::Notifications>,
 you should have a look at L<Mojolicious::Plugin::Humane>,
@@ -128,7 +126,8 @@ which was the original inspiration for this plugin.
 =head1 METHODS
 
 L<Mojolicious::Plugin::Notifications::Humane> inherits all methods
-from L<Mojolicious::Plugin> and implements the following new one.
+from L<Mojolicious::Plugin::Notifications::Engine> and implements or overrides
+the following.
 
 =head2 register
 
