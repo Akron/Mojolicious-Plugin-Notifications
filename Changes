@@ -1,6 +1,7 @@
 0.04 2014-09-07
         - Added experimental AssetPack support.
 	- Added abstract M::P::N::Engine package.
+	- Engines based on Mojolicious::Plugin are now DEPRECATED.
 	- Added M::P::N::Assets package.
 
 0.03 2014-06-01

@@ -2,6 +2,7 @@ package Mojolicious::Plugin::Notifications;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojolicious::Plugin::Notifications::Assets;
 use Mojo::Util qw/camelize/;
+use Scalar::Util qw/blessed/;
 
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
@@ -48,7 +49,13 @@ sub register {
 
   # Set assets
   foreach (values %engine) {
+
     # The check is a deprecation option!
+    if (!$_->can('styles') || !$_->can('scripts')) {
+      $mojo->log->warn(blessed($_) . ' is not based on ' .
+        __PACKAGE__ . '::Engine, which is DEPRECATED!');
+    };
+
     $asset->styles($_->styles)   if $_->can('styles');
     $asset->scripts($_->scripts) if $_->can('scripts');
   };
