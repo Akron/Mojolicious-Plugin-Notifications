@@ -16,7 +16,7 @@ state $path = '/humane/';
 
 # Register plugin
 sub register {
-  my ($plugin, $mojo, $param) = @_;
+  my ($plugin, $app, $param) = @_;
 
   # Set config
   $plugin->base_class(   $param->{base_class}   // 'libnotify' );
@@ -26,7 +26,7 @@ sub register {
   $plugin->styles(  $path . $plugin->base_class . '.css');
 
   # Add static path to JavaScript
-  push @{$mojo->static->paths},
+  push @{$app->static->paths},
     File::Spec->catdir( File::Basename::dirname(__FILE__), 'Humane' );
 };
 

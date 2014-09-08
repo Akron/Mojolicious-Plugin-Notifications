@@ -5,7 +5,7 @@ has key => 'notifications';
 
 # Nothing to register
 sub register {
-  my ($plugin, $mojo, $param) = @_;
+  my ($plugin, $app, $param) = @_;
   $plugin->key($param->{key}) if $param->{key};
 };
 

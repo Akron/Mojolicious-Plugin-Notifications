@@ -14,21 +14,18 @@ our $VERSION = '0.4';
 
 # Register plugin
 sub register {
-  my ($plugin, $mojo, $param) = @_;
+  my ($plugin, $app, $param) = @_;
 
   $param ||= {};
 
-  my $debug = $mojo->mode eq 'development' ? 1 : 0;
+  my $debug = $app->mode eq 'development' ? 1 : 0;
 
   # Load parameter from Config file
-  if (my $config_param = $mojo->config('Notifications')) {
+  if (my $config_param = $app->config('Notifications')) {
     $param = { %$param, %$config_param };
   };
 
   $param->{HTML} = 1 unless keys %$param;
-
-  # Get helpers object
-  my $helpers = $mojo->renderer->helpers;
 
   # Add engines from configuration
   my %engine;
@@ -39,8 +36,8 @@ sub register {
     };
 
     # Load engine
-    my $e = $mojo->plugins->load_plugin($engine);
-    $e->register($mojo, ref $param->{$name} ? $param->{$name} : undef);
+    my $e = $app->plugins->load_plugin($engine);
+    $e->register($app, ref $param->{$name} ? $param->{$name} : undef);
     $engine{lc $name} = $e;
   };
 
@@ -52,7 +49,7 @@ sub register {
 
     # The check is a deprecation option!
     if (!$_->can('styles') || !$_->can('scripts')) {
-      $mojo->log->warn(blessed($_) . ' is not based on ' .
+      $app->log->warn(blessed($_) . ' is not based on ' .
         __PACKAGE__ . '::Engine, which is DEPRECATED!');
     };
 
@@ -61,7 +58,7 @@ sub register {
   };
 
   # Add notifications
-  $mojo->helper(
+  $app->helper(
     notify => sub {
       my $c = shift;
       my $type = shift;
@@ -97,7 +94,7 @@ sub register {
 
 
   # Embed notification display
-  $mojo->helper(
+  $app->helper(
     notifications => sub {
       my $c = shift;
 
@@ -262,9 +259,8 @@ in the L<AssetPack|Mojolicious::Plugin::AssetPack> pipeline.
   app->plugin('AssetPack');
 
   # Add notification assets to pipeline
-  my $assets = app->notifications;
-  app->asset('myApp.js'  => $assets->scripts);
-  app->asset('myApp.css' => $assets->styles);
+  app->asset('myApp.js'  => 'myscripts.coffee', app->notifications->scripts);
+  app->asset('myApp.css' => 'mystyles.scss', app->notifications->styles);
 
   %# In templates embed assets ...
   %= asset 'myApp.js'

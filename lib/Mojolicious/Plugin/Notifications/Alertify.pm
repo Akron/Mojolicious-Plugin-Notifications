@@ -16,7 +16,7 @@ state $path = '/alertify/';
 
 # Register plugin
 sub register {
-  my ($plugin, $mojo, $param) = @_;
+  my ($plugin, $app, $param) = @_;
 
   # Set config
   $plugin->base_class(   $param->{base_class}   // 'default' );
@@ -29,7 +29,7 @@ sub register {
   );
 
   # Add static path to JavaScript
-  push @{$mojo->static->paths},
+  push @{$app->static->paths},
     File::Spec->catdir( File::Basename::dirname(__FILE__), 'Alertify' );
 };
 
