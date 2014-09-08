@@ -74,7 +74,7 @@ Mojolicious::Plugin::Notifications::JSON - Event Notifications in JSON
 This plugin is a simple notification engine for JSON.
 
 If it does not suit your needs, you can easily
-L<write your own engine|Mojolicious::Plugin::Notifications::Engine/Writing your own engine>.
+L<write your own engine|Mojolicious::Plugin::Notifications::Engine>.
 
 
 =head1 METHODS

@@ -116,7 +116,7 @@ This plugin is a notification engine using
 L<Humane.js|http://wavded.github.io/humane-js/>.
 
 If this does not suit your needs, you can easily
-L<write your own engine|Mojolicious::Plugin::Notifications::Engine/Writing your own engine>.
+L<write your own engine|Mojolicious::Plugin::Notifications::Engine>.
 
 If you want to use Humane.js without L<Mojolicious::Plugin::Notifications>,
 you should have a look at L<Mojolicious::Plugin::Humane>,

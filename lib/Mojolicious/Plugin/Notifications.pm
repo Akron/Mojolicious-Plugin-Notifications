@@ -240,25 +240,30 @@ Engine parameters are documented in the respective plugins.
 
 In case no engine name is passed to the notifications method,
 an L<assets object|Mojolicious::Plugin::Notifications::Assets>
-is returned, bundling all engines' assets for use
+is returned, bundling all registered engines' assets for use
 in the L<AssetPack|Mojolicious::Plugin::AssetPack> pipeline.
 
   # Register Notifications plugin
-  $self->plugin('Notifications' => {
+  app->plugin('Notifications' => {
     Humane => {
       base_class => 'libnotify'
     },
-    JSON => 1
+    Alertify => 1
   );
 
   # Register AssetPack plugin
-  $self->plugin('AssetPack');
+  app->plugin('AssetPack');
 
-  # Add assets to pipeline
-  $self->assets('my.js'  => $self->notifications->scripts);
-  $self->assets('my.css' => $self->notifications->styles);
+  # Add notification assets to pipeline
+  my $assets = app->notifications;
+  app->asset('myApp.js'  => $assets->scripts);
+  app->asset('myApp.css' => $assets->styles);
 
-  %# Embed notifications without assets
+  %# In templates embed assets ...
+  %= asset 'myApp.js'
+  %= asset 'myApp.css'
+
+  %# ... and notifications (without assets)
   %= notifications 'humane', -no_include;
 
 B<The asset helper option is experimental and may change without warnings!>
@@ -268,7 +273,7 @@ B<The asset helper option is experimental and may change without warnings!>
 
 L<Mojolicious::Plugin::Notifications> bundles a couple of different
 notification engines, but you can
-L<easily write your own engine|Mojolicious::Plugin::Notifications::Engine/Writing your own engine>.
+L<easily write your own engine|Mojolicious::Plugin::Notifications::Engine>.
 
 
 =head2 Bundled engines
@@ -278,6 +283,21 @@ L<HTML|Mojolicious::Plugin::Notifications::HTML>,
 L<JSON|Mojolicious::Plugin::Notifications::JSON>,
 L<Humane.js|Mojolicious::Plugin::Notifications::Humane>, and
 L<Alertify.js|Mojolicious::Plugin::Notifications::Alertify>,
+
+
+=head1 SEE ALSO
+
+If you want to use Humane.js without L<Mojolicious::Plugin::Notifications>,
+you should have a look at L<Mojolicious::Plugin::Humane>,
+which was the original inspiration for this plugin.
+
+Without my knowledge (due to a lack of research by myself),
+L<Mojolicious::Plugin::BootstrapAlerts> already established
+a similar mechanism for notifications using Twitter Bootstrap
+(not yet supported by this module).
+Accidentally the helper names collide - I'm sorry for that!
+On the other hands, that makes these modules in most occasions
+compatible.
 
 
 =head1 AVAILABILITY

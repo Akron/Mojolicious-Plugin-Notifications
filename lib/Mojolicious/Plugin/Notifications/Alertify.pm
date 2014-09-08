@@ -110,7 +110,7 @@ This plugin is a notification engine using
 L<Alertify.js|http://fabien-d.github.io/alertify.js/>.
 
 If this does not suit your needs, you can easily
-L<write your own engine|Mojolicious::Plugin::Notifications::Engine/Writing your own engine>.
+L<write your own engine|Mojolicious::Plugin::Notifications::Engine>.
 
 
 =head1 METHODS

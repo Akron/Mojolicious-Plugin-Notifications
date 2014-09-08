@@ -1,7 +1,5 @@
 package Mojolicious::Plugin::Notifications::HTML;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
-use Mojo::Collection 'c';
-use Mojo::ByteStream 'b';
 use Mojo::Util qw/xml_escape/;
 
 # Notification method
@@ -15,7 +13,7 @@ sub notifications {
 	"</div>\n";
   };
 
-  return b($html);
+  return $c->b($html);
 };
 
 
@@ -49,7 +47,7 @@ Mojolicious::Plugin::Notifications::HTML - Event Notifications using HTML
 This plugin is a simple notification engine for HTML.
 
 If it does not suit your needs, you can easily
-L<write your own engine|Mojolicious::Plugin::Notifications::Engine/Writing your own engine>.
+L<write your own engine|Mojolicious::Plugin::Notifications::Engine>.
 
 
 =head1 HELPERS
