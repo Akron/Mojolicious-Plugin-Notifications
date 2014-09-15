@@ -1,3 +1,7 @@
+0.05 2014-09-15
+        - Changed tx->resume() method to hook for multiple redirect support.
+	- Flash and stash notifications will now be merged.
+
 0.04 2014-09-07
         - Added experimental AssetPack support.
 	- Added abstract M::P::N::Engine package.

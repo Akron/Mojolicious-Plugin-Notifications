@@ -45,6 +45,7 @@ get '/deep/in/the/:target' => sub {
 
 get '/wood' => sub {
   my $c = shift;
+  $c->notify(warn => 'yiahh');
   return $c->redirect_to('/damn')
 };
 
@@ -56,7 +57,7 @@ $t->get_ok('/')->status_is(200)->content_like(qr/flasherror/);
 $t->get_ok('/deep/in/the/damn')->status_is(200)->content_like(qr/flasherror2000/);
 $t->get_ok('/deep/in/the/wood')->status_is(302)->session_is('/dont' => 'be affected either');
 $t->ua->max_redirects(2);
-$t->get_ok('/deep/in/the/wood')->status_is(200)->content_like(qr/flasherror2000/);
+$t->get_ok('/deep/in/the/wood')->status_is(200)->content_like(qr/flasherror2000/)->content_like(qr/yiahh/);
 
 $t->ua->max_redirects(0);
 $t->get_ok('/')->status_is(302)->content_is('');
