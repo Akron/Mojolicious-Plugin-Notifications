@@ -6,7 +6,7 @@ use Scalar::Util qw/blessed/;
 
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 # Todo: Support Multiple Times Loading
 # Explain camelize and :: behaviour for engine names
@@ -57,6 +57,7 @@ sub register {
     $asset->scripts($_->scripts) if $_->can('scripts');
   };
 
+
   # Add notifications
   $app->helper(
     notify => sub {
@@ -77,17 +78,6 @@ sub register {
       # New notifications
       else {
 	$c->stash('notify.array' => [[$type => @msg]]);
-
-	# Watch out - may break whenever something weird in the order
-	# between after_dispatch and resume happens
-	$c->tx->once(
-	  resume => sub {
-	    my $tx = shift;
-	    if ($tx->res->is_status_class(300)) {
-	      $c->flash('n!.a' => delete $c->stash->{'notify.array'});
-	      $c->app->sessions->store($c);
-	    };
-	  });
       };
     }
   );
@@ -140,6 +130,37 @@ sub register {
       };
     }
   );
+
+
+  # Add hook for redirects
+  $app->hook(
+    after_dispatch => sub {
+      my $c = shift;
+      if ($c->res->is_status_class(300)) {
+
+	# Get notify array from stash
+	my $notes = delete $c->stash->{'notify.array'};
+
+	# Check flash notes
+	if ($c->flash('n!.a')) {
+
+	  # Merge notes with flash
+	  if ($notes) {
+	    unshift @$notes, @{$c->flash('n!.a')};
+	  }
+
+	  # Get notes from flash
+	  else {
+	    $notes = $c->flash('n!.a');
+	  };
+	};
+
+	if ($notes) {
+	  $c->flash('n!.a' => $notes);
+	  $c->app->sessions->store($c);
+	};
+      };
+    });
 };
 
 
@@ -181,8 +202,8 @@ Mojolicious::Plugin::Notifications - Frontend Event Notifications
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Notifications> supports several engines
-to notify users on events. Notifications will survive redirects
-and can be served depending on response types.
+to notify users on events. Notifications will survive multiple
+redirects and can be served depending on response types.
 
 
 =head1 METHODS

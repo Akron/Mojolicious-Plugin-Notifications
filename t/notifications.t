@@ -36,10 +36,27 @@ get '/' => sub {
   return $c->redirect_to('/damn');
 };
 
+get '/deep/in/the/:target' => sub {
+  my $c = shift;
+  $c->notify(warn => 'flasherror2000');
+  $c->session(dont => 'be affected either');
+  return $c->redirect_to('/' . $c->stash('target'));
+};
+
+get '/wood' => sub {
+  my $c = shift;
+  return $c->redirect_to('/damn')
+};
 
 $t->get_ok('/')->status_is(302)->content_is('');
+$t->get_ok('/deep/in/the/damn')->status_is(302)->session_is('/dont' => 'be affected either');
+$t->get_ok('/deep/in/the/wood')->status_is(302)->session_is('/dont' => 'be affected either');
 $t->ua->max_redirects(1);
 $t->get_ok('/')->status_is(200)->content_like(qr/flasherror/);
+$t->get_ok('/deep/in/the/damn')->status_is(200)->content_like(qr/flasherror2000/);
+$t->get_ok('/deep/in/the/wood')->status_is(302)->session_is('/dont' => 'be affected either');
+$t->ua->max_redirects(2);
+$t->get_ok('/deep/in/the/wood')->status_is(200)->content_like(qr/flasherror2000/);
 
 $t->ua->max_redirects(0);
 $t->get_ok('/')->status_is(302)->content_is('');
