@@ -1,6 +1,11 @@
 package Mojolicious::Plugin::Notifications::Assets;
 use Mojo::Base -strict;
 
+# Don't stringify, in case someone forgot to define an engine
+use overload '""' => sub { '' }, fallback => 1;
+
+
+# Constructor
 sub new {
   bless {
     styles => [],
@@ -8,12 +13,16 @@ sub new {
   }, shift;
 };
 
+
+# Get or add styles
 sub styles {
   my $self = shift;
   return sort @{ $self->{styles} } unless @_;
   push(@{$self->{styles}}, @_);
 };
 
+
+# Get or add scripts
 sub scripts {
   my $self = shift;
   return sort @{ $self->{scripts} } unless @_;

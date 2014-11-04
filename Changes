@@ -1,3 +1,7 @@
+0.06 2014-11-04
+        - Fix minor documentation error.
+	- Remove deprecated use of object-oriented Mojo::JSON.
+
 0.05 2014-09-15
         - Changed tx->resume() method to hook for multiple redirect support.
 	- Flash and stash notifications will now be merged.

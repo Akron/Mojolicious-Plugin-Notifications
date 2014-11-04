@@ -4,9 +4,14 @@ use Mojolicious::Plugin::Notifications::Assets;
 use Mojo::Util qw/camelize/;
 use Scalar::Util qw/blessed/;
 
+# Temporary
+use Data::Dumper;
+
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
+
+# Todo: Maybe revert to tx-handler and use session instead of flash!
 
 # Todo: Support Multiple Times Loading
 # Explain camelize and :: behaviour for engine names
@@ -97,13 +102,14 @@ sub register {
 
       # Get flash notifications
       my $flash = $c->flash('n!.a');
+
       if ($flash && ref $flash eq 'ARRAY') {
 
 	# Ensure that no harmful types are injected
 	push @notify_array, grep { $_->[0] =~ $TYPE_RE } @$flash;
 
 	# Use "n!.a" instead of notify.array as this goes into the cookie
-	$c->flash('n!.a' => undef);
+	# $c->flash('n!.a' => undef);
       };
 
       # Get stash notifications
@@ -136,8 +142,8 @@ sub register {
   $app->hook(
     after_dispatch => sub {
       my $c = shift;
-      if ($c->res->is_status_class(300)) {
 
+      if ($c->res->is_status_class(300)) {
 	# Get notify array from stash
 	my $notes = delete $c->stash->{'notify.array'};
 
@@ -157,7 +163,7 @@ sub register {
 
 	if ($notes) {
 	  $c->flash('n!.a' => $notes);
-	  $c->app->sessions->store($c);
+#	  $c->app->sessions->store($c);
 	};
       };
     });
@@ -274,7 +280,7 @@ in the L<AssetPack|Mojolicious::Plugin::AssetPack> pipeline.
       base_class => 'libnotify'
     },
     Alertify => 1
-  );
+  });
 
   # Register AssetPack plugin
   app->plugin('AssetPack');
@@ -322,6 +328,12 @@ a similar mechanism for notifications using Twitter Bootstrap
 Accidentally the helper names collide - I'm sorry for that!
 On the other hands, that makes these modules in most occasions
 compatible.
+
+
+=head1 HINTS
+
+As flash information is stored in the session, notifications may be lost
+in case the session expires using C<$c->session(expires => 1)>.
 
 
 =head1 AVAILABILITY

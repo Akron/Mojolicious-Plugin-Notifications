@@ -2,13 +2,9 @@ package Mojolicious::Plugin::Notifications::Humane;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/xml_escape/;
-use Mojo::JSON;
+use Mojo::JSON qw/encode_json decode_json/;
 use File::Spec;
 use File::Basename;
-
-has json => sub {
-  state $json = Mojo::JSON->new
-};
 
 has [qw/base_class base_timeout/];
 
@@ -59,13 +55,11 @@ sub notifications {
 
   my ($log, %notify) = ('');
 
-  my $json = $self->json;
-
   # Add notifications
   foreach (@$notify_array) {
     $notify{$_->[0]} = 1;
-    $log .= '.' . $_->[0] . '(' . $json->encode($_->[-1]);
-    $log .= ', ' . $json->encode($_->[1]) if scalar @{$_} == 3;
+    $log .= '.' . $_->[0] . '(' . encode_json($_->[-1]);
+    $log .= ', ' . encode_json($_->[1]) if scalar @{$_} == 3;
     $log .= ')';
 
     $noscript .= qq{<div class="notify notify-} . $_->[0] . '">' .

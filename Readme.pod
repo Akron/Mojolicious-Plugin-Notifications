@@ -31,8 +31,8 @@ Mojolicious::Plugin::Notifications - Frontend Event Notifications
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Notifications> supports several engines
-to notify users on events. Notifications will survive redirects
-and can be served depending on response types.
+to notify users on events. Notifications will survive multiple
+redirects and can be served depending on response types.
 
 
 =head1 METHODS
@@ -103,7 +103,7 @@ in the L<AssetPack|Mojolicious::Plugin::AssetPack> pipeline.
       base_class => 'libnotify'
     },
     Alertify => 1
-  );
+  });
 
   # Register AssetPack plugin
   app->plugin('AssetPack');
@@ -151,6 +151,12 @@ a similar mechanism for notifications using Twitter Bootstrap
 Accidentally the helper names collide - I'm sorry for that!
 On the other hands, that makes these modules in most occasions
 compatible.
+
+
+=head1 HINTS
+
+As flash information is stored in the session, notifications may be lost
+in case the session expires using C<$c->session(expires => 1)>.
 
 
 =head1 AVAILABILITY
