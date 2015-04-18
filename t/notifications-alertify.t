@@ -13,8 +13,7 @@ $app->plugin('Notifications' => {
   Alertify => 1
 });
 
-my $co = Mojolicious::Controller->new;
-$co->app($app);
+my $co = $app->build_controller;
 
 ok(!$co->notifications('alertify'), 'No alert');
 

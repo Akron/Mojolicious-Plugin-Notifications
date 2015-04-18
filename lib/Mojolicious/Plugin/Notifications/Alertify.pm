@@ -7,7 +7,6 @@ use File::Spec;
 use File::Basename;
 
 has [qw/base_class base_timeout/];
-
 state $path = '/alertify/';
 
 # Register plugin

@@ -14,8 +14,7 @@ $app->plugin('Notifications' => {
 #  HTML => 1
 });
 
-my $co = Mojolicious::Controller->new;
-$co->app($app);
+my $co = $app->build_controller;
 
 ok(!$co->notifications('json'), 'No notification yet');
 

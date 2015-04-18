@@ -13,8 +13,7 @@ $app->plugin('Notifications' => {
   Humane => 1
 });
 
-my $co = Mojolicious::Controller->new;
-$co->app($app);
+my $co = $app->build_controller;
 
 like($co->notifications(humane => [qw/warn/]), qr/humane-libnotify-warn/, 'No center');
 

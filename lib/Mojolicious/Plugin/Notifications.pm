@@ -4,12 +4,9 @@ use Mojolicious::Plugin::Notifications::Assets;
 use Mojo::Util qw/camelize/;
 use Scalar::Util qw/blessed/;
 
-# Temporary
-use Data::Dumper;
-
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
-our $VERSION = '0.6';
+our $VERSION = '0.8';
 
 # Todo: Maybe revert to tx-handler and use session instead of flash!
 
@@ -343,7 +340,7 @@ in case the session expires using C<$c->session(expires => 1)>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2015, L<Nils Diewald|http://nils-diewald.de/>.
 
 Part of the code was written at the
 L<Mojoconf 2014|http://www.mojoconf.org/mojo2014/> hackathon.

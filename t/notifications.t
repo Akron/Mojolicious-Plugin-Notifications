@@ -13,8 +13,7 @@ my $app = $t->app;
 
 $app->plugin('Notifications');
 
-my $co = Mojolicious::Controller->new;
-$co->app($app);
+my $co = $app->build_controller;
 
 $co->notify(warn => q/That's a warning/);
 $co->notify(error => q/That's an error message/);
