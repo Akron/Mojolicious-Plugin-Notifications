@@ -6,7 +6,7 @@ use Scalar::Util qw/blessed/;
 
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 # Todo: Maybe revert to tx-handler and use session instead of flash!
 

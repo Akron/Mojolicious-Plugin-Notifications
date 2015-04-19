@@ -1,3 +1,6 @@
+0.09 2015-04-19
+        - Update dependency on Test::Mojo::Session.
+
 0.08 2015-04-18
         - Update for use with Mojolicious 6.
 
