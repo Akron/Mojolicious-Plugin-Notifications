@@ -6,7 +6,7 @@ use Scalar::Util qw/blessed/;
 
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
-our $VERSION = '0.9';
+our $VERSION = '0.10';
 
 # Todo: Maybe revert to tx-handler and use session instead of flash!
 
@@ -160,7 +160,6 @@ sub register {
 
 	if ($notes) {
 	  $c->flash('n!.a' => $notes);
-#	  $c->app->sessions->store($c);
 	};
       };
     });

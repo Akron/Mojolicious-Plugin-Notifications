@@ -1,3 +1,6 @@
+0.10 2015-06-18
+        - Introduced example for plugins.
+
 0.09 2015-04-19
         - Update dependency on Test::Mojo::Session.
 
