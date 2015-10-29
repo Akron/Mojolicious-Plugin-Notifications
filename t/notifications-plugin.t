@@ -3,9 +3,7 @@ use Test::Mojo::Session;
 use Test::More;
 use Mojolicious::Lite;
 
-$|++;
-
-use lib ('lib', '../lib', 't');
+use lib 't';
 
 my $t = Test::Mojo::Session->new;
 

@@ -3,10 +3,6 @@ use Test::Mojo::Session;
 use Test::More;
 use Mojolicious::Lite;
 
-$|++;
-
-use lib ('lib', '../lib');
-
 my $t = Test::Mojo::Session->new;
 
 my $app = $t->app;
@@ -35,6 +31,12 @@ get '/' => sub {
   return $c->redirect_to('/damn');
 };
 
+get '/nested/path' => sub {
+  my $c = shift;
+  $c->notify(warn => 'nested');
+  return $c->redirect_to('/');
+};
+
 get '/deep/in/the/:target' => sub {
   my $c = shift;
   $c->notify(warn => 'flasherror2000');
@@ -55,13 +57,21 @@ $t->ua->max_redirects(1);
 $t->get_ok('/')->status_is(200)->content_like(qr/flasherror/);
 $t->get_ok('/deep/in/the/damn')->status_is(200)->content_like(qr/flasherror2000/);
 $t->get_ok('/deep/in/the/wood')->status_is(302)->session_is('/dont' => 'be affected either');
+
 $t->ua->max_redirects(2);
 $t->get_ok('/deep/in/the/wood')->status_is(200)->content_like(qr/flasherror2000/)->content_like(qr/yiahh/);
+
+$t->get_ok('/nested/path')
+  ->status_is(200)
+  ->content_like(qr/nested/)
+  ->content_like(qr/flasherror/)
+  ->session_is('/dont' => 'be affected');
 
 $t->ua->max_redirects(0);
 $t->get_ok('/')->status_is(302)->content_is('');
 $t->get_ok('/damn')->status_is(200)->session_is('/dont' => 'be affected')->content_like(qr/flasherror/);
 $t->get_ok('/damn')->status_is(200)->session_is('/dont' => 'be affected')->content_is('nope');
+
 
 is ($co->notifications->scripts, (), 'Javascripts');
 is ($co->notifications->styles, (), 'Styles');

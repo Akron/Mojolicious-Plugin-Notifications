@@ -2,8 +2,6 @@
 use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
-$|++;
-use lib ('lib', '../lib');
 
 my $t = Test::Mojo->new;
 
