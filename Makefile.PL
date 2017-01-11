@@ -14,7 +14,7 @@ WriteMakefile(
     'Test::Mojo::Session' => 1.04
   },
   PREREQ_PM => {
-    'Mojolicious' => 5.30
+    'Mojolicious' => 7.13
   },
   LICENSE      => 'artistic_2',
   META_MERGE   => {

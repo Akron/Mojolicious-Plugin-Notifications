@@ -6,7 +6,7 @@ use Scalar::Util qw/blessed/;
 
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # Todo: Maybe revert to tx-handler and use session instead of flash!
 
@@ -74,12 +74,12 @@ sub register {
 
       # Notifications already set
       if ($array = $c->stash('notify.array')) {
-	push (@$array, [$type => @msg]);
+        push (@$array, [$type => @msg]);
       }
 
       # New notifications
       else {
-	$c->stash('notify.array' => [[$type => @msg]]);
+        $c->stash('notify.array' => [[$type => @msg]]);
       };
     }
   );
@@ -102,16 +102,16 @@ sub register {
 
       if ($flash && ref $flash eq 'ARRAY') {
 
-	# Ensure that no harmful types are injected
-	push @notify_array, grep { $_->[0] =~ $TYPE_RE } @$flash;
+        # Ensure that no harmful types are injected
+        push @notify_array, grep { $_->[0] =~ $TYPE_RE } @$flash;
 
-	# Use "n!.a" instead of notify.array as this goes into the cookie
-	# $c->flash('n!.a' => undef);
+        # Use "n!.a" instead of notify.array as this goes into the cookie
+        # $c->flash('n!.a' => undef);
       };
 
       # Get stash notifications
       if ($c->stash('notify.array')) {
-	push @notify_array, @{ delete $c->stash->{'notify.array'} };
+        push @notify_array, @{ delete $c->stash->{'notify.array'} };
       };
 
       # Nothing to do
@@ -120,16 +120,16 @@ sub register {
       # Forward messages to notification center
       if (exists $engine{$e_type}) {
 
-	my %rule;
-	while ($param[-1] && index($param[-1], '-') == 0) {
-	  $rule{lc(substr(pop @param, 1))} = 1;
-	};
+        my %rule;
+        while ($param[-1] && index($param[-1], '-') == 0) {
+          $rule{lc(substr(pop @param, 1))} = 1;
+        };
 
-	return $engine{$e_type}->notifications($c, \@notify_array, \%rule, @param);
+        return $engine{$e_type}->notifications($c, \@notify_array, \%rule, @param);
       }
       else {
-	$c->app->log->error(qq{Unknown notification engine "$e_type"});
-	return;
+        $c->app->log->error(qq{Unknown notification engine "$e_type"});
+        return;
       };
     }
   );
@@ -140,27 +140,27 @@ sub register {
     after_dispatch => sub {
       my $c = shift;
 
-      if ($c->res->is_status_class(300)) {
-	# Get notify array from stash
-	my $notes = delete $c->stash->{'notify.array'};
+      if ($c->res->is_redirect) {
+        # Get notify array from stash
+        my $notes = delete $c->stash->{'notify.array'};
 
-	# Check flash notes
-	if ($c->flash('n!.a')) {
+        # Check flash notes
+        if ($c->flash('n!.a')) {
 
-	  # Merge notes with flash
-	  if ($notes) {
-	    unshift @$notes, @{$c->flash('n!.a')};
-	  }
+          # Merge notes with flash
+          if ($notes) {
+            unshift @$notes, @{$c->flash('n!.a')};
+          }
 
-	  # Get notes from flash
-	  else {
-	    $notes = $c->flash('n!.a');
-	  };
-	};
+          # Get notes from flash
+          else {
+            $notes = $c->flash('n!.a');
+          };
+        };
 
-	if ($notes) {
-	  $c->flash('n!.a' => $notes);
-	};
+        if ($notes) {
+          $c->flash('n!.a' => $notes);
+        };
       };
     });
 };
@@ -339,7 +339,7 @@ in case the session expires using C<$c->session(expires => 1)>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2017, L<Nils Diewald|http://nils-diewald.de/>.
 
 Part of the code was written at the
 L<Mojoconf 2014|http://www.mojoconf.org/mojo2014/> hackathon.
