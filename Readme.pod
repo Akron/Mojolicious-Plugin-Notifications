@@ -156,7 +156,7 @@ compatible.
 =head1 HINTS
 
 As flash information is stored in the session, notifications may be lost
-in case the session expires using C<$c->session(expires => 1)>.
+in case the session expires using C<$c-E<gt>session(expires => 1)>.
 
 
 =head1 AVAILABILITY
@@ -166,7 +166,7 @@ in case the session expires using C<$c->session(expires => 1)>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2017, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 Part of the code was written at the
 L<Mojoconf 2014|http://www.mojoconf.org/mojo2014/> hackathon.

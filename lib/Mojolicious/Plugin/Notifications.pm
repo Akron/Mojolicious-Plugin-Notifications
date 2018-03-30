@@ -8,11 +8,17 @@ our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
 our $VERSION = '1.01';
 
-# Todo: Maybe revert to tx-handler and use session instead of flash!
+# TODO:
+#   Maybe revert to tx-handler and use session instead of flash!
 
-# Todo: Support Multiple Times Loading
-# Explain camelize and :: behaviour for engine names
-# Subroutines for Engines should be given directly
+# TODO:
+#   Support Multiple Times Loading
+# TODO:
+#   Explain camelize and :: behaviour for engine names
+# TODO:
+#   Subroutines for Engines should be given directly
+# TODO:
+#   Engines may use hooks in addition
 
 # Register plugin
 sub register {
@@ -329,7 +335,7 @@ compatible.
 =head1 HINTS
 
 As flash information is stored in the session, notifications may be lost
-in case the session expires using C<$c->session(expires => 1)>.
+in case the session expires using C<$c-E<gt>session(expires => 1)>.
 
 
 =head1 AVAILABILITY
@@ -339,7 +345,7 @@ in case the session expires using C<$c->session(expires => 1)>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2017, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 Part of the code was written at the
 L<Mojoconf 2014|http://www.mojoconf.org/mojo2014/> hackathon.
