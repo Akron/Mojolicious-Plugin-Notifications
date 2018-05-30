@@ -1,5 +1,6 @@
 package Mojolicious::Plugin::Notifications;
 use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Collection;
 use Mojolicious::Plugin::Notifications::Assets;
 use Mojo::Util qw/camelize/;
 use Scalar::Util qw/blessed/;
@@ -101,7 +102,7 @@ sub register {
       my $e_type = lc shift;
       my @param = @_;
 
-      my @notify_array;
+      my $notes = Mojo::Collection->new;
 
       # Get flash notifications
       my $flash = $c->flash('n!.a');
@@ -109,19 +110,16 @@ sub register {
       if ($flash && ref $flash eq 'ARRAY') {
 
         # Ensure that no harmful types are injected
-        push @notify_array, grep { $_->[0] =~ $TYPE_RE } @$flash;
-
-        # Use "n!.a" instead of notify.array as this goes into the cookie
-        # $c->flash('n!.a' => undef);
+        push @$notes, grep { $_->[0] =~ $TYPE_RE } @$flash;
       };
 
       # Get stash notifications
       if ($c->stash('notify.array')) {
-        push @notify_array, @{ delete $c->stash->{'notify.array'} };
+        push @$notes, @{ delete $c->stash->{'notify.array'} };
       };
 
       # Nothing to do
-      return '' unless @notify_array || @_;
+      return '' unless $notes->size || @_;
 
       # Forward messages to notification center
       if (exists $engine{$e_type}) {
@@ -131,7 +129,7 @@ sub register {
           $rule{lc(substr(pop @param, 1))} = 1;
         };
 
-        return $engine{$e_type}->notifications($c, \@notify_array, \%rule, @param);
+        return $engine{$e_type}->notifications($c, $notes, \%rule, @param);
       }
       else {
         $c->app->log->error(qq{Unknown notification engine "$e_type"});

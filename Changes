@@ -1,5 +1,6 @@
 1.02 2017-05-30
-        - introduced notify_html() function.
+        - Introduced notify_html() function.
+        - Use Mojo::Collection for notifications.
 
 1.01 2017-04-27
         - Fixed version to be compliant with perl/cpan
