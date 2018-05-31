@@ -2,6 +2,8 @@
         - Introduced notify_html() function.
         - Use Mojo::Collection for notifications.
         - Introduced "before_notifications" hook.
+        - Removed deprecated support of 'Mojolicious::Plugin'
+          based engines.
 
 1.01 2017-04-27
         - Fixed version to be compliant with perl/cpan

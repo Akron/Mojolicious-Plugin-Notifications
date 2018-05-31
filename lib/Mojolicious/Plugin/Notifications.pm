@@ -55,13 +55,6 @@ sub register {
 
   # Set assets
   foreach (values %engine) {
-
-    # The check is a deprecation option!
-    if (!$_->can('styles') || !$_->can('scripts')) {
-      $app->log->warn(blessed($_) . ' is not based on ' .
-        __PACKAGE__ . '::Engine, which is DEPRECATED!');
-    };
-
     $asset->styles($_->styles)   if $_->can('styles');
     $asset->scripts($_->scripts) if $_->can('scripts');
   };
