@@ -212,6 +212,12 @@ which notification types are presupported.
 In addition to types and messages, further refinements can
 be passed at the second position.
 
+In case an C<ok> parameter is passed, this will create a
+notification that requires a click to be closed.
+The C<ok> URL will receive a POST request on closing.
+
+B<Confirmation is EXPERIMENTAL!>
+
 
 =head2 notifications
 

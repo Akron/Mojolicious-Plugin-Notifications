@@ -140,8 +140,42 @@ Defaults to C<notifications>.
 
 =head2 notify
 
+  $c->notify(warn => 'wrong');
+  $c->notify(confirm => { ok => '/ok', cancel => '/cancel' } => 'Please, confirm!');
+
+  $c->render(json => $c->notifications(json => { text => 'html' }));
+  # {
+  #   "notifications":[
+  #     ["warn", "wrong"],
+  #     [
+  #       "confirm",
+  #       "Please, confirm!",
+  #       {
+  #         "cancel":{
+  #           "method":"POST",
+  #           "url":"\/cancel"
+  #         },
+  #         "ok":{
+  #           "method":"POST",
+  #           "url":"\/ok"
+  #         }
+  #       }
+  #     ]
+  #   ],
+  #   "text":"example"
+  # }
+
+
 See the base L<notify|Mojolicious::Plugin::Notifications/notify> helper.
 
+In case an C<ok> or C<cancel> parameter is passed,
+this will add an object containing confirmation and/or cancellation paths.
+In case an C<ok_label> is passed, this will be the key for the
+confirmation object.
+In case a C<cancel_label> is passed, this will be the key
+for the cancelation object.
+
+B<Confirmation is EXPERIMENTAL!>
 
 =head2 notifications
 

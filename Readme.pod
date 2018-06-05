@@ -138,9 +138,25 @@ L<Humane.js|Mojolicious::Plugin::Notifications::Humane>, and
 L<Alertify.js|Mojolicious::Plugin::Notifications::Alertify>,
 
 
+=head1 HOOKS
+
+  app->hook(
+    before_notifications => sub {
+      my ($c, $notes) = @_;
+      $c->app->log('Served ' . $notes->size . ' notifications to ' . $c->stash('user'));
+    });
+
+This hook is emitted before any notifications are rendered.
+The hook passes the current controller object and a L<Mojo::Collection>
+object including all notes.
+The hook is emitted no matter if notifications are pending.
+
+B<This hook is EXPERIMENTAL!>
+
+
 =head1 SEE ALSO
 
-If you want to use Humane.js without L<Mojolicious::Plugin::Notifications>,
+If you want to use C<Humane.js> without L<Mojolicious::Plugin::Notifications>,
 you should have a look at L<Mojolicious::Plugin::Humane>,
 which was the original inspiration for this plugin.
 
@@ -156,7 +172,7 @@ compatible.
 =head1 HINTS
 
 As flash information is stored in the session, notifications may be lost
-in case the session expires using C<$c-E<gt>session(expires => 1)>.
+in case the session expires using C<session(expires => 1)>.
 
 
 =head1 AVAILABILITY
@@ -166,7 +182,7 @@ in case the session expires using C<$c-E<gt>session(expires => 1)>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2018, L<Nils Diewald|https://nils-diewald.de/>.
 
 Part of the code was written at the
 L<Mojoconf 2014|http://www.mojoconf.org/mojo2014/> hackathon.

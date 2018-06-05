@@ -100,7 +100,9 @@ See the base L<notify|Mojolicious::Plugin::Notifications/notify> helper.
   # <div class="notify notify-warn">wrong</div>
   # <div class="notify notify-success">right</div>
 
-Will render each notification using L</notify_html>.
+Will render each notification using
+L<notify_html|Mojolicious::Plugin::Notifications::HTML/notify_html>.
+
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -111,11 +113,30 @@ Will render each notification using L</notify_html>.
   notify_html(warn => 'This is a warning')
   # <div class="notify notify-warn">This is a warning</div>
 
+  notify_html(announce => {
+    ok => 'http://example.com/ok',
+    ok_label => 'Okay!'
+  # }, 'Confirm, please!')
+  # <div class="notify notify-announce">
+  #   Confirm, please!
+  #   <form action="http://example.com/ok" method="post">
+  #     <button>Okay!</button>
+  #   </form>
+  # </div>
+
 Returns the formatted text in a C<E<lt>div /E<gt>> element
 with the class C<notify> and the class C<notify-$type>, where C<$type> is
 the notification type you passed.
+In case an C<ok> parameter is passed, this will add a POST form
+for confirmation. In case an C<ok_label> is passed, this will be the label
+for the confirmation button.
+In case a C<cancel> parameter is passed, this will add a POST form
+for cancelation. In case a C<cancel_label> is passed, this will be the label
+for the cancelation button.
 
 This is meant to be used by other engines as a fallback.
+
+B<Confirmation is EXPERIMENTAL!>
 
 
 =head1 AVAILABILITY

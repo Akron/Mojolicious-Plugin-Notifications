@@ -4,6 +4,14 @@ use Test::More;
 use Mojolicious::Lite;
 use utf8;
 
+use_ok('Mojolicious::Plugin::Notifications::HTML', 'notify_html');
+
+is(notify_html('announce',{
+  ok => 'http://example.com/ok',
+    ok_label => 'Okay!'
+},'Confirm, please!'),
+   '<div class="notify notify-announce">Confirm, please!<form action="http://example.com/ok" method="post"><button>Okay!</button></form></div>'."\n");
+
 my $t = Test::Mojo->new;
 
 post '/ok' => sub {

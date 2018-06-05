@@ -195,6 +195,7 @@ Set to C<0> for no timeout.
   # In controllers
   $c->notify(warn => 'Something went wrong');
   $c->notify(success => { timeout => 2000 } => 'Everything went fine');
+  $c->notify(success => { ok => 'http://example.com/ok' } => 'Everything went fine');
 
 Notify the user on certain events.
 
@@ -202,8 +203,18 @@ See the documentation for your chosen theme
 at L<Alertify.js|http://fabien-d.github.io/alertify.js/> to see,
 which notification types are presupported.
 
-In addition to types and messages, the timeout can be defined
+In addition to types and messages, the C<timeout> can be defined
 in a hash reference.
+
+In case an C<ok> or C<cancel> parameter is passed, this will create a confirmation
+notification. The C<ok> and C<cancel> URLs will receive a POST request,
+once the buttons are pressed.
+In case an C<ok_label> is passed, this will be the label
+for the confirmation button.
+In case a C<cancel_label> is passed, this will be the label
+for the cancelation button.
+
+B<Confirmation is EXPERIMENTAL!>
 
 
 =head2 notifications
