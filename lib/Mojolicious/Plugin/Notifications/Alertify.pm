@@ -52,17 +52,25 @@ sub notifications {
 
   # Add notifications
   foreach (@$notify_array) {
-    $js .= 'alertify.log(' . quote($_->[-1]);
-    $js .= ',' . quote($_->[0]) . ',';
-    if (scalar @{$_} == 3) {
-      $js .= $_->[1]->{timeout} // $self->base_timeout;
+
+    my $type = $_->[0];
+
+    if ($type eq 'confirm') {
+      $noscript .= confirm_html(@_);
     }
     else {
-      $js .= $self->base_timeout
-    };
-    $js .= ");\n";
 
-    $noscript .= notify_html($_->[0], $_->[-1]);
+      $js .= 'alertify.log(' . quote($_->[-1]);
+      $js .= ',' . quote($type) . ',';
+      if (scalar @{$_} == 3) {
+        $js .= $_->[1]->{timeout} // $self->base_timeout;
+      }
+      else {
+        $js .= $self->base_timeout
+      };
+      $js .= ");\n";
+      $noscript .= notify_html($_->[0], $_->[-1]);
+    };
   };
 
   return b($js . "//]]>\n</script>\n" . $noscript . '</noscript>');

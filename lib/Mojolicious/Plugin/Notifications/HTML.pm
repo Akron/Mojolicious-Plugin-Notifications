@@ -5,13 +5,32 @@ use Mojo::Util qw/xml_escape/;
 
 our @EXPORT_OK = ('notify_html');
 
+# TODO:
+#   Only use xml_escape unless it is a Mojo::ByteStream object
+
 # Exportable function
 sub notify_html {
   my ($type, $msg) = @_;
   return qq{<div class="notify notify-$type">} .
     xml_escape($msg) .
-    "</div>\n"
+    "</div>\n";
 };
+
+
+# Exportable function
+sub confirm_html {
+  my ($type, $param, $msg) = @_;
+  my $callback_url = $param->{callback_url};
+
+  my $str = '<div class="notify notify-$type">';
+  $str .= xml_escape($msg);
+  $str .= '<form action="' . $callback_url . '" method="post">';
+  $str .= '<button name="action" value="confirm">OK</button>';
+  $str .= '<button name="action" value="cancel">Cancel</button>';
+  $str .= '</form>';
+  $str .= "</div>\n";
+};
+
 
 # Notification method
 sub notifications {
@@ -19,7 +38,14 @@ sub notifications {
 
   my $html = '';
   foreach (@$notify_array) {
-    $html .= notify_html($_->[0], $_->[-1]);
+    my $type = $_->[0];
+
+    if ($type eq 'confirm' && scalar @{$_} == 3) {
+      $html .= confirm_html(@_);
+    }
+    else {
+      $html .= notify_html($type, $_->[-1]);
+    };
   };
 
   return $c->b($html);
