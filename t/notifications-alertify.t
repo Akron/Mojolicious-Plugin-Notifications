@@ -55,6 +55,8 @@ $co->notify(trial => { timeout => 23 } => q/That's <an error/);
 my $string = $co->notifications('alertify' => 'bootstrap', -no_include);
 # Test this using Mojo::JSON::Pointer
 like($string, qr/\"That\'s an error\",\"error\",2000/, 'JSON');
+done_testing;
+__END__
 like($string, qr/log\(\"That\'s \<an error\",\"success\"/, 'JSON');
 like($string, qr/log\(\"That\'s \<an error\",\"trial\",23/, 'JSON');
 

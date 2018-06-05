@@ -1,3 +1,6 @@
+1.03 2018-06-05
+        - Introduced 'confirmation' types.
+
 1.02 2018-05-30
         - Introduced notify_html() function.
         - Use Mojo::Collection for notifications.

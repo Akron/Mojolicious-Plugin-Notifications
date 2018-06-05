@@ -21,7 +21,36 @@ sub notifications {
   if (!$json || ref $json) {
     my @msgs;
     foreach (@$notify_array) {
-      push(@msgs, [$_->[0], $_->[-1]]);
+
+      # Confirmation message
+      if (ref $_->[1] && ($_->[1]->{ok} || $_->[1]->{cancel})) {
+        my $param = $_->[1];
+
+        my $opt = {};
+
+        # Set confirmation path
+        if ($param->{ok}) {
+          $opt->{$param->{ok_label} // 'ok'} = {
+            method => 'POST',
+            url => $param->{ok}
+          };
+        }
+
+        # Set cancelation path
+        if ($param->{cancel}) {
+          $opt->{$param->{cancel_label} // 'cancel'} = {
+            method => 'POST',
+            url => $param->{cancel}
+          };
+        };
+
+        push @msgs, [$_->[0], $_->[-1], $opt];
+      }
+
+      # Normal notification
+      else {
+        push(@msgs, [$_->[0], $_->[-1]]);
+      };
     };
 
     if (!$json) {
@@ -143,7 +172,7 @@ The name defaults to C<notifications>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

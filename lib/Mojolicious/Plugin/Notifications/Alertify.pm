@@ -53,24 +53,62 @@ sub notifications {
   # Add notifications
   foreach (@$notify_array) {
 
-    my $type = $_->[0];
+    # Get parameter
+    my $param = $_->[1] if scalar @{$_} == 3;
 
-    if ($type eq 'confirm') {
-      $noscript .= confirm_html(@_);
+    # Confirmation
+    if ($param && ($param->{ok} || $param->{cancel})) {
+
+      # Set labels
+      if ($param->{ok_label} || $param->{cancel_label}) {
+        $js .= 'alertify.set({labels:{';
+        $js .= 'ok:'.quote($param->{ok_label} // 'OK') . ',' ;
+        $js .= 'cancel:'.quote($param->{cancel_label} // 'Cancel');
+        $js .= "}});\n";
+      };
+
+      # Create confirmation
+      $js .= 'alertify.confirm(' . quote($_->[-1]);
+      $js .= ',function(ok){';
+      $js .= 'var r=new XMLHttpRequest();';
+      if ($param->{ok} && $param->{cancel}) {
+        $js .= 'if(ok){';
+        $js .=   'r.open("POST",' . quote($param->{ok}) . ');';
+        $js .=   'r.send()';
+        $js .= '}else{';
+        $js .=   'r.open("POST",' . quote($param->{cancel}) . ');';
+        $js .=   'r.send()';
+        $js .= '};';
+      }
+      elsif ($param->{ok}) {
+        $js .= 'if(ok){';
+        $js .=   'r.open("POST",' . quote($param->{ok}) . ');';
+        $js .=   'r.send()';
+        $js .= '};';
+      }
+      else {
+        $js .= 'if(!ok){';
+        $js .=   'r.open("POST",' . quote($param->{cancel}) . ');';
+        $js .=   'r.send()';
+        $js .= '};';
+      };
+      $js .= '},' . quote('notify notify-' . $_->[0]);
+      $js .= ");\n";
     }
-    else {
 
+    # Normal alert
+    else {
       $js .= 'alertify.log(' . quote($_->[-1]);
-      $js .= ',' . quote($type) . ',';
-      if (scalar @{$_} == 3) {
-        $js .= $_->[1]->{timeout} // $self->base_timeout;
+      $js .= ',' . quote($_->[0]) . ',';
+      if ($param) {
+        $js .= $param->{timeout} // $self->base_timeout;
       }
       else {
         $js .= $self->base_timeout
       };
       $js .= ");\n";
-      $noscript .= notify_html($_->[0], $_->[-1]);
     };
+    $noscript .= notify_html(@$_);
   };
 
   return b($js . "//]]>\n</script>\n" . $noscript . '</noscript>');

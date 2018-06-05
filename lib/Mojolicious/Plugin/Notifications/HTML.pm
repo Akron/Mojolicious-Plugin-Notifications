@@ -10,25 +10,31 @@ our @EXPORT_OK = ('notify_html');
 
 # Exportable function
 sub notify_html {
-  my ($type, $msg) = @_;
-  return qq{<div class="notify notify-$type">} .
-    xml_escape($msg) .
-    "</div>\n";
-};
+  my $type = shift;
+  my $param = shift if ref $_[0];
+  my $msg = pop;
 
-
-# Exportable function
-sub confirm_html {
-  my ($type, $param, $msg) = @_;
-  my $callback_url = $param->{callback_url};
-
-  my $str = '<div class="notify notify-$type">';
+  my $str = qq{<div class="notify notify-$type">};
   $str .= xml_escape($msg);
-  $str .= '<form action="' . $callback_url . '" method="post">';
-  $str .= '<button name="action" value="confirm">OK</button>';
-  $str .= '<button name="action" value="cancel">Cancel</button>';
-  $str .= '</form>';
-  $str .= "</div>\n";
+
+  # Check for confirmation
+  if ($param) {
+
+    # Okay path is defined
+    if ($param->{ok}) {
+      $str .= '<form action="' . $param->{ok} . '" method="post">';
+      $str .= '<button>' . ($param->{ok_label} // 'OK') . '</button>';
+      $str .= '</form>';
+    };
+
+    # Cancel path is defined
+    if ($param->{cancel}) {
+      $str .= '<form action="' . $param->{cancel} . '" method="post">';
+      $str .= '<button>' . ($param->{cancel_label} // 'Cancel') . '</button>';
+      $str .= '</form>';
+    };
+  };
+  return $str . "</div>\n";
 };
 
 
@@ -38,14 +44,7 @@ sub notifications {
 
   my $html = '';
   foreach (@$notify_array) {
-    my $type = $_->[0];
-
-    if ($type eq 'confirm' && scalar @{$_} == 3) {
-      $html .= confirm_html(@_);
-    }
-    else {
-      $html .= notify_html($type, $_->[-1]);
-    };
+    $html .= notify_html(@{$_});
   };
 
   return $c->b($html);
@@ -101,10 +100,7 @@ See the base L<notify|Mojolicious::Plugin::Notifications/notify> helper.
   # <div class="notify notify-warn">wrong</div>
   # <div class="notify notify-success">right</div>
 
-Will render each notification as text in a C<E<lt>div /E<gt>> element
-with the class C<notify> and the class C<notify-$type>, where C<$type> is
-the notification type you passed.
-
+Will render each notification using L</notify_html>.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -115,8 +111,11 @@ the notification type you passed.
   notify_html(warn => 'This is a warning')
   # <div class="notify notify-warn">This is a warning</div>
 
-Returns the formatted string of a single HTML notification. This
-can be used by other engines as a fallback.
+Returns the formatted text in a C<E<lt>div /E<gt>> element
+with the class C<notify> and the class C<notify-$type>, where C<$type> is
+the notification type you passed.
+
+This is meant to be used by other engines as a fallback.
 
 
 =head1 AVAILABILITY
