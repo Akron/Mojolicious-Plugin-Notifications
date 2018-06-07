@@ -23,14 +23,14 @@ sub notify_html {
     # Okay path is defined
     if ($param->{ok}) {
       $str .= '<form action="' . $param->{ok} . '" method="post">';
-      $str .= '<button>' . ($param->{ok_label} // 'OK') . '</button>';
+      $str .= '<button class="ok">' . ($param->{ok_label} // 'OK') . '</button>';
       $str .= '</form>';
     };
 
     # Cancel path is defined
     if ($param->{cancel}) {
       $str .= '<form action="' . $param->{cancel} . '" method="post">';
-      $str .= '<button>' . ($param->{cancel_label} // 'Cancel') . '</button>';
+      $str .= '<button class="cancel">' . ($param->{cancel_label} // 'Cancel') . '</button>';
       $str .= '</form>';
     };
   };
