@@ -29,7 +29,6 @@ sub register {
     File::Spec->catdir( File::Basename::dirname(__FILE__), 'Alertify' );
 };
 
-
 # Notification method
 sub notifications {
   my ($self, $c, $notify_array, $rule, @post) = @_;
@@ -49,6 +48,10 @@ sub notifications {
   # Start JavaScript snippet
   $js .= qq{<script>//<![CDATA[\n};
   my $noscript = "<noscript>";
+
+  sub _ajax ($) {
+    return 'r.open("POST",' . quote($_[0]) . ');r.send()';
+  };
 
   # Add notifications
   foreach (@$notify_array) {
@@ -72,28 +75,16 @@ sub notifications {
       $js .= ',function(ok){';
       $js .= 'var r=new XMLHttpRequest();';
       if ($param->{ok} && $param->{cancel}) {
-        $js .= 'if(ok){';
-        $js .=   'r.open("POST",' . quote($param->{ok}) . ');';
-        $js .=   'r.send()';
-        $js .= '}else{';
-        $js .=   'r.open("POST",' . quote($param->{cancel}) . ');';
-        $js .=   'r.send()';
-        $js .= '};';
+        $js .= 'if(ok){'. _ajax($param->{ok}) .
+          '}else{' . _ajax($param->{cancel}) . '};';
       }
       elsif ($param->{ok}) {
-        $js .= 'if(ok){';
-        $js .=   'r.open("POST",' . quote($param->{ok}) . ');';
-        $js .=   'r.send()';
-        $js .= '};';
+        $js .= 'if(ok){' . _ajax($param->{ok}) . '};';
       }
       else {
-        $js .= 'if(!ok){';
-        $js .=   'r.open("POST",' . quote($param->{cancel}) . ');';
-        $js .=   'r.send()';
-        $js .= '};';
+        $js .= 'if(!ok){' . _ajax($param->{cancel}) . '};';
       };
-      $js .= '},' . quote('notify notify-' . $_->[0]);
-      $js .= ");\n";
+      $js .= '},' . quote('notify notify-' . $_->[0]) . ");\n";
     }
 
     # Normal alert
