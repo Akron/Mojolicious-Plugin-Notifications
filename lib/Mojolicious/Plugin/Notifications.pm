@@ -11,11 +11,8 @@ our $VERSION = '1.03';
 
 # TODO:
 #   Maybe revert to tx-handler and use session instead of flash!
-
 # TODO:
 #   Support Multiple Times Loading
-# TODO:
-#   Explain camelize and :: behaviour for engine names
 # TODO:
 #   Subroutines for Engines should be given directly
 # TODO:
@@ -265,6 +262,9 @@ and the engine has to be L<registered|/register> in advance.
 Notifications won't be invoked in case no notifications are
 in the queue and no further engine parameters are passed.
 Engine parameters are documented in the respective plugins.
+
+The engine's name will be camelized. If no namespace is given,
+the default namespace is C<Mojolicious::Plugin::Notifications>.
 
 In case no engine name is passed to the notifications method,
 an L<assets object|Mojolicious::Plugin::Notifications::Assets>
