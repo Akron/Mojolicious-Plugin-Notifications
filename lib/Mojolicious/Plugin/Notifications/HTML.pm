@@ -2,6 +2,7 @@ package Mojolicious::Plugin::Notifications::HTML;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 use Exporter 'import';
 use Mojo::Util qw/xml_escape/;
+use Scalar::Util qw/blessed/;
 
 our @EXPORT_OK = ('notify_html');
 
@@ -10,6 +11,7 @@ our @EXPORT_OK = ('notify_html');
 
 # Exportable function
 sub notify_html {
+  my $c = shift if blessed $_[0] && $_[0]->isa('Mojolicious::Controller');
   my $type = shift;
   my $param = shift if ref $_[0];
   my $msg = pop;
@@ -23,6 +25,7 @@ sub notify_html {
     # Okay path is defined
     if ($param->{ok}) {
       $str .= '<form action="' . $param->{ok} . '" method="post">';
+      $str .= $c->csrf_field if $c;
       $str .= '<button class="ok">' . ($param->{ok_label} // 'OK') . '</button>';
       $str .= '</form>';
     };
@@ -30,6 +33,7 @@ sub notify_html {
     # Cancel path is defined
     if ($param->{cancel}) {
       $str .= '<form action="' . $param->{cancel} . '" method="post">';
+      $str .= $c->csrf_field if $c;
       $str .= '<button class="cancel">' . ($param->{cancel_label} // 'Cancel') . '</button>';
       $str .= '</form>';
     };
@@ -44,7 +48,7 @@ sub notifications {
 
   my $html = '';
   foreach (@$notify_array) {
-    $html .= notify_html(@{$_});
+    $html .= notify_html($c, @{$_});
   };
 
   return $c->b($html);
@@ -133,6 +137,11 @@ for the confirmation button.
 In case a C<cancel> parameter is passed, this will add a POST form
 for cancelation. In case a C<cancel_label> is passed, this will be the label
 for the cancelation button.
+
+If the first parameter is a L<Mojolicious::Controller> object,
+the button will have a
+L<csrf_token|Mojolicious::Plugin::TagHelpers/csrf_token>
+parameter to validate.
 
 This is meant to be used by other engines as a fallback.
 

@@ -1,6 +1,10 @@
 package Mojolicious::Plugin::Notifications::JSON;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 
+# TODO:
+#   Instead of 'ok' and 'cancel', probably pass an additional
+#   'confirm' route, that will open a form instead.
+
 has key => 'notifications';
 
 # Nothing to register
@@ -174,6 +178,9 @@ In case an C<ok_label> is passed, this will be the key for the
 confirmation object.
 In case a C<cancel_label> is passed, this will be the key
 for the cancelation object.
+
+Confirmation routes for JSON do not support CSRF protection.
+
 
 B<Confirmation is EXPERIMENTAL!>
 

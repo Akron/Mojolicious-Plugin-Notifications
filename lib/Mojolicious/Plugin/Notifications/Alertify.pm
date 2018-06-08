@@ -47,10 +47,12 @@ sub notifications {
 
   # Start JavaScript snippet
   $js .= qq{<script>//<![CDATA[\n};
+  $js .= 'var x=' . quote($c->csrf_token) . ';';
   my $noscript = "<noscript>";
 
+  my $csrf = $c->csrf_token;
   sub _ajax ($) {
-    return 'r.open("POST",' . quote($_[0]) . ');r.send()';
+    return 'r.open("POST",' . quote($_[0]) . ');r.send("csrf_token="+x);r.send()';
   };
 
   # Add notifications
@@ -73,7 +75,8 @@ sub notifications {
       # Create confirmation
       $js .= 'alertify.confirm(' . quote($_->[-1]);
       $js .= ',function(ok){';
-      $js .= 'var r=new XMLHttpRequest();';
+      $js .= 'var r=new XMLHttpRequest();r.setRequestHeader("Content-type","application/x-www-form-urlencoded");';
+
       if ($param->{ok} && $param->{cancel}) {
         $js .= 'if(ok){'. _ajax($param->{ok}) .
           '}else{' . _ajax($param->{cancel}) . '};';
@@ -99,7 +102,7 @@ sub notifications {
       };
       $js .= ");\n";
     };
-    $noscript .= notify_html(@$_);
+    $noscript .= notify_html($c, @$_);
   };
 
   return b($js . "//]]>\n</script>\n" . $noscript . '</noscript>');
@@ -204,6 +207,8 @@ In case an C<ok_label> is passed, this will be the label
 for the confirmation button.
 In case a C<cancel_label> is passed, this will be the label
 for the cancelation button.
+The POST will have a L<csrf_token|Mojolicious::Plugin::TagHelpers/csrf_token>
+parameter to validate.
 
 B<Confirmation is EXPERIMENTAL!>
 

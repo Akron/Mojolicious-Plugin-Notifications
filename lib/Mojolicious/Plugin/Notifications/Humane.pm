@@ -51,6 +51,7 @@ sub notifications {
 
   # Start JavaScript snippet
   $js .= qq{<script>//<![CDATA[\n} .
+    'var x=' . quote($c->csrf_token) . ';' .
     qq!var notify=humane.create({baseCls:'humane-$base_class',timeout:! .
       $self->base_timeout . ",clickToClose:true});\n";
 
@@ -86,9 +87,9 @@ sub notifications {
         $log .= ', ' . encode_json(\%param) if keys %param;
 
         # Define callback
-        $log .= ', function(){var r=new XMLHttpRequest();r.open("POST",';
-        $log .= quote($url);
-        $log .= ');r.send()}';
+        $log .= ', function(){var r=new XMLHttpRequest();';
+        $log .= 'r.setRequestHeader("Content-type","application/x-www-form-urlencoded");';
+        $log .= 'r.open("POST",' . quote($url) . ');r.send("csrf_token="+x);r.send()}';
       }
 
       # Normal notification
@@ -103,7 +104,7 @@ sub notifications {
     };
     $log .= ')';
 
-    $noscript .= notify_html(@{$_});
+    $noscript .= notify_html($c, @{$_});
   };
   $log = "notify$log;\n" if $log;
 
@@ -215,6 +216,8 @@ be passed at the second position.
 In case an C<ok> parameter is passed, this will create a
 notification that requires a click to be closed.
 The C<ok> URL will receive a POST request on closing.
+The POST will have a L<csrf_token|Mojolicious::Plugin::TagHelpers/csrf_token>
+parameter to validate.
 
 B<Confirmation is EXPERIMENTAL!>
 

@@ -93,7 +93,9 @@ $t->get_ok('/html/simple')
   ->status_is(200)
   ->text_is('div.notify.notify-warn', 'That\'s a warning')
   ->text_is('div.notify form[action$=ok][method="post"] > button', 'OK')
+  ->element_exists('div.notify form[action$=ok] > input[type=hidden][name=csrf_token]')
   ->text_is('div.notify form[action$=cancel][method="post"] > button', 'Cancel')
+  ->element_exists('div.notify form[action$=cancel] > input[type=hidden][name=csrf_token]')
   ;
 
 $t->get_ok('/html/labels')
@@ -101,6 +103,7 @@ $t->get_ok('/html/labels')
   ->text_is('div.notify.notify-warn', 'That\'s a warning')
   ->text_is('div.notify form[action$=ok][method="post"] > button', 'Fine!')
   ->text_is('div.notify form[action$=cancel][method="post"] > button', 'Nope!')
+  ->element_exists('div.notify form[action$=cancel] > input[type=hidden][name=csrf_token]')
   ;
 
 $t->get_ok('/html/onlycancel')
@@ -108,6 +111,7 @@ $t->get_ok('/html/onlycancel')
   ->text_is('div.notify.notify-warn', 'That\'s a warning')
   ->element_exists_not('form[action$=ok] > button')
   ->text_is('div.notify form[action$=cancel][method="post"] > button', 'Cancel')
+  ->element_exists('div.notify form[action$=cancel] > input[type=hidden][name=csrf_token]')
   ;
 
 unlike($loglines, qr/Notifications/);
@@ -118,23 +122,31 @@ $t->get_ok('/alertify/simple')
   ->text_is('noscript div.notify.notify-warn', 'That\'s a warning')
   ->text_is('noscript div.notify form[action$=ok][method="post"] > button', 'OK')
   ->text_is('noscript div.notify form[action$=cancel][method="post"] > button', 'Cancel')
+  ->element_exists('noscript div.notify form[action$=ok] > input[type=hidden][name=csrf_token]')
   ->content_unlike(qr/alertify\.set/)
   ->content_like(qr/alertify\.confirm\(\"That\'s/)
   ->content_like(qr/,function\(ok\)\{var /)
-  ->content_like(qr/XMLHttpRequest\(\);if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
-  ->content_like(qr/;r\.send\(\)\}else\{r\.open\(\"POST\",\"\/cancel\"\);r\.send\(\)\};\}/)
+  ->content_like(qr/XMLHttpRequest\(\);r\.setRequestHeader\([^)]+\);/)
+  ->content_like(qr/if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
+  ->content_like(qr/r\.send\("csrf_token="\+x\);r\.send\(\)\}else/)
+  ->content_like(qr/\}else\{r\.open\(\"POST\",\"\/cancel\"\)/)
+  ->content_like(qr/r\.send\("csrf_token="\+x\);r\.send\(\)\};\}/)
   ;
+
 
 $t->get_ok('/alertify/labels')
   ->status_is(200)
   ->text_is('noscript div.notify.notify-warn', 'That\'s a warning')
   ->text_is('noscript div.notify form[action$=ok][method="post"] > button', 'Fine!')
   ->text_is('noscript div.notify form[action$=cancel][method="post"] > button', 'Nope!')
-  ->content_like(qr/alertify\.set\(\{labels:\{ok:\"Fine!\",cancel:\"Nope!\"\}\}\);/)
+  ->element_exists('noscript div.notify form[action$=ok] > input[type=hidden][name=csrf_token]')
+  ->content_like(qr/;alertify\.set\(\{labels:\{ok:\"Fine!\",cancel:\"Nope!\"\}\}\);/)
   ->content_like(qr/alertify\.confirm\(\"That\'s/)
   ->content_like(qr/,function\(ok\)\{var /)
-  ->content_like(qr/XMLHttpRequest\(\);if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
-  ->content_like(qr/;r\.send\(\)\}else\{r\.open\(\"POST\",\"\/cancel\"\);r\.send\(\)\};\}/)
+  ->content_like(qr/XMLHttpRequest\(\);r\.setRequestHeader\([^)]+\);/)
+  ->content_like(qr/if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
+  ->content_like(qr/;r\.send\(\)\}else\{r\.open\(\"POST\",\"\/cancel\"\)/)
+  ->content_like(qr/r\.send\("csrf_token="\+x\);r\.send\(\)\};\}/)
   ;
 
 $t->get_ok('/alertify/onlycancel')
@@ -142,10 +154,12 @@ $t->get_ok('/alertify/onlycancel')
   ->text_is('noscript div.notify.notify-warn', 'That\'s a warning')
   ->element_exists_not('form[action$=ok] > button')
   ->text_is('noscript div.notify form[action$=cancel][method="post"] > button', 'Cancel')
+  ->element_exists('noscript div.notify form[action$=cancel] > input[type=hidden][name=csrf_token]')
   ->content_unlike(qr/alertify\.set/)
   ->content_like(qr/alertify\.confirm\(\"That\'s/)
   ->content_like(qr/,function\(ok\)\{var /)
-  ->content_like(qr/XMLHttpRequest\(\);if\(!ok\)\{r\.open\(\"POST\"\,\"\/cancel\"\)/)
+  ->content_like(qr/XMLHttpRequest\(\);r\.setRequestHeader\([^)]+\);/)
+  ->content_like(qr/;if\(!ok\)\{r\.open\(\"POST\"\,\"\/cancel\"\)/)
   ;
 
 $t->get_ok('/alertify/onlyok')
@@ -153,11 +167,14 @@ $t->get_ok('/alertify/onlyok')
   ->text_is('noscript div.notify.notify-warn', 'That\'s a warning')
   ->element_exists_not('form[action$=cancel] > button')
   ->text_is('noscript div.notify form[action$=ok][method="post"] > button', 'OK')
+  ->element_exists('noscript div.notify form[action$=ok] > input[type=hidden][name=csrf_token]')
   ->content_unlike(qr/alertify\.set/)
   ->content_like(qr/alertify\.confirm\(\"That\'s/)
   ->content_like(qr/,function\(ok\)\{var /)
-  ->content_like(qr/XMLHttpRequest\(\);if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
+  ->content_like(qr/XMLHttpRequest\(\);r\.setRequestHeader\([^)]+\);/)
+  ->content_like(qr/if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
   ;
+
 
 unlike($loglines, qr/Notifications/);
 
@@ -201,9 +218,12 @@ $t->get_ok('/humane/simple')
   ->text_is('noscript div.notify.notify-warn', 'That\'s a warning')
   ->text_is('noscript div.notify form[action$=ok][method="post"] > button', 'OK')
   ->text_is('noscript div.notify form[action$=cancel][method="post"] > button', 'Cancel')
+  ->element_exists('noscript div.notify form[action$=ok] > input[type=hidden][name=csrf_token]')
+  ->content_like(qr/var x=\"/)
   ->content_like(qr/notify\.warn\(\"That\'s a warning\",/)
   ->content_like(qr/\{\"timeout\":0\}/)
-  ->content_like(qr/function\(\)\{var r=new XMLHttpRequest\(\);r\.open\(\"POST\",\"\/ok\"\);r.send\(\)\}/)
+  ->content_like(qr/function\(\)\{var r=new XMLHttpRequest\(\)/)
+  ->content_like(qr/;r\.open\(\"POST\",\"\/ok\"\);r\.send\(\"csrf/)
   ;
 
 $t->get_ok('/humane/labels')
@@ -211,9 +231,12 @@ $t->get_ok('/humane/labels')
   ->text_is('noscript div.notify.notify-warn', 'That\'s a warning')
   ->text_is('noscript div.notify form[action$=ok][method="post"] > button', 'Fine!')
   ->text_is('noscript div.notify form[action$=cancel][method="post"] > button', 'Nope!')
+  ->element_exists('noscript div.notify form[action$=ok] > input[type=hidden][name=csrf_token]')
   ->content_like(qr/notify\.warn\(\"That\'s a warning\",/)
   ->content_like(qr/\{\"timeout\":0\}/)
-  ->content_like(qr/function\(\)\{var r=new XMLHttpRequest\(\);r\.open\(\"POST\",\"\/ok\"\);r.send\(\)\}/)
+  ->content_like(qr/function\(\)\{var r=new XMLHttpRequest\(\);/)
+  ->content_like(qr/XMLHttpRequest\(\);r\.setRequestHeader\([^)]+\);/)
+  ->content_like(qr/r\.open\(\"POST\",\"\/ok\"\);r\.send\(\"csrf_token=\"/)
   ;
 
 like($loglines, qr/Notifications/);
@@ -224,6 +247,7 @@ $t->get_ok('/humane/onlycancel')
   ->text_is('noscript div.notify.notify-warn', 'That\'s a warning')
   ->element_exists_not('form[action$=ok] > button')
   ->text_is('noscript div.notify form[action$=cancel][method="post"] > button', 'Cancel')
+  ->element_exists('noscript div.notify form[action$=cancel] > input[type=hidden][name=csrf_token]')
   ->content_like(qr/notify\.warn\(\"That\'s a warning\"\)/)
   ;
 
@@ -237,7 +261,9 @@ $t->get_ok('/humane/onlyok')
   ->text_is('noscript div.notify form[action$=ok][method="post"] > button', 'OK')
   ->content_like(qr/notify\.warn\(\"That\'s a warning\",/)
   ->content_like(qr/\{\"timeout\":0\}/)
-  ->content_like(qr/function\(\)\{var r=new XMLHttpRequest\(\);r\.open\(\"POST\",\"\/ok\"\);r.send\(\)\}/)
+  ->content_like(qr/function\(\)\{var r=new XMLHttpRequest\(\);/)
+  ->content_like(qr/XMLHttpRequest\(\);r\.setRequestHeader\([^)]+\);/)
+  ->content_like(qr/r\.open\(\"POST\",\"\/ok\"\);r.send\(\"csrf_token=\"\+x/)
   ;
 
 unlike($loglines, qr/Notifications/);
