@@ -126,13 +126,13 @@ $t->get_ok('/alertify/simple')
   ->content_unlike(qr/alertify\.set/)
   ->content_like(qr/alertify\.confirm\(\"That\'s/)
   ->content_like(qr/,function\(ok\)\{var /)
-  ->content_like(qr/XMLHttpRequest\(\);r\.setRequestHeader\([^)]+\);/)
+  ->content_like(qr/XMLHttpRequest\(\);/)
+  ->content_like(qr/r\.setRequestHeader\([^)]+\);/)
   ->content_like(qr/if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
-  ->content_like(qr/r\.send\("csrf_token="\+x\);r\.send\(\)\}else/)
   ->content_like(qr/\}else\{r\.open\(\"POST\",\"\/cancel\"\)/)
-  ->content_like(qr/r\.send\("csrf_token="\+x\);r\.send\(\)\};\}/)
+  ->content_like(qr/r\.send\("csrf_token="\+x\);v=true\}else/)
+  ->content_like(qr/r\.send\("csrf_token="\+x\);v=true\};/)
   ;
-
 
 $t->get_ok('/alertify/labels')
   ->status_is(200)
@@ -143,10 +143,11 @@ $t->get_ok('/alertify/labels')
   ->content_like(qr/;alertify\.set\(\{labels:\{ok:\"Fine!\",cancel:\"Nope!\"\}\}\);/)
   ->content_like(qr/alertify\.confirm\(\"That\'s/)
   ->content_like(qr/,function\(ok\)\{var /)
-  ->content_like(qr/XMLHttpRequest\(\);r\.setRequestHeader\([^)]+\);/)
+  ->content_like(qr/XMLHttpRequest\(\);/)
+  ->content_like(qr/r\.setRequestHeader\([^)]+\);/)
   ->content_like(qr/if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
-  ->content_like(qr/;r\.send\(\)\}else\{r\.open\(\"POST\",\"\/cancel\"\)/)
-  ->content_like(qr/r\.send\("csrf_token="\+x\);r\.send\(\)\};\}/)
+  ->content_like(qr/\}else\{r\.open\(\"POST\",\"\/cancel\"\)/)
+  ->content_like(qr/r\.send\("csrf_token="\+x\);v=true\};/)
   ;
 
 $t->get_ok('/alertify/onlycancel')
@@ -158,7 +159,6 @@ $t->get_ok('/alertify/onlycancel')
   ->content_unlike(qr/alertify\.set/)
   ->content_like(qr/alertify\.confirm\(\"That\'s/)
   ->content_like(qr/,function\(ok\)\{var /)
-  ->content_like(qr/XMLHttpRequest\(\);r\.setRequestHeader\([^)]+\);/)
   ->content_like(qr/;if\(!ok\)\{r\.open\(\"POST\"\,\"\/cancel\"\)/)
   ;
 
@@ -171,10 +171,10 @@ $t->get_ok('/alertify/onlyok')
   ->content_unlike(qr/alertify\.set/)
   ->content_like(qr/alertify\.confirm\(\"That\'s/)
   ->content_like(qr/,function\(ok\)\{var /)
-  ->content_like(qr/XMLHttpRequest\(\);r\.setRequestHeader\([^)]+\);/)
   ->content_like(qr/if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
+  ->content_like(qr/XMLHttpRequest\(\);/)
+  ->content_like(qr/r\.setRequestHeader\([^)]+\);/)
   ;
-
 
 unlike($loglines, qr/Notifications/);
 

@@ -52,7 +52,7 @@ sub notifications {
 
   my $csrf = $c->csrf_token;
   sub _ajax ($) {
-    return 'r.open("POST",' . quote($_[0]) . ');r.send("csrf_token="+x);r.send()';
+    return 'r.open("POST",' . quote($_[0]) . ');r.send("csrf_token="+x);v=true';
   };
 
   # Add notifications
@@ -75,7 +75,7 @@ sub notifications {
       # Create confirmation
       $js .= 'alertify.confirm(' . quote($_->[-1]);
       $js .= ',function(ok){';
-      $js .= 'var r=new XMLHttpRequest();r.setRequestHeader("Content-type","application/x-www-form-urlencoded");';
+      $js .= 'var r=new XMLHttpRequest();var v;';
 
       if ($param->{ok} && $param->{cancel}) {
         $js .= 'if(ok){'. _ajax($param->{ok}) .
@@ -87,7 +87,10 @@ sub notifications {
       else {
         $js .= 'if(!ok){' . _ajax($param->{cancel}) . '};';
       };
-      $js .= '},' . quote('notify notify-' . $_->[0]) . ");\n";
+      $js .= 'if(v){';
+      $js .= 'r.setRequestHeader("Content-type","application/x-www-form-urlencoded");';
+      $js .= 'r.send()';
+      $js .= '}},' . quote('notify notify-' . $_->[0]) . ");\n";
     }
 
     # Normal alert
