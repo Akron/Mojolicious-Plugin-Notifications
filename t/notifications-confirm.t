@@ -130,8 +130,9 @@ $t->get_ok('/alertify/simple')
   ->content_like(qr/r\.setRequestHeader\([^)]+\);/)
   ->content_like(qr/if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
   ->content_like(qr/\}else\{r\.open\(\"POST\",\"\/cancel\"\)/)
-  ->content_like(qr/r\.send\("csrf_token="\+x\);v=true\}else/)
-  ->content_like(qr/r\.send\("csrf_token="\+x\);v=true\};/)
+  ->content_like(qr/;v=true\}else/)
+  ->content_like(qr/;v=true\};/)
+  ->content_like(qr/r\.send\("csrf_token="\+x\)/)
   ;
 
 $t->get_ok('/alertify/labels')
@@ -147,7 +148,8 @@ $t->get_ok('/alertify/labels')
   ->content_like(qr/r\.setRequestHeader\([^)]+\);/)
   ->content_like(qr/if\(ok\)\{r\.open\(\"POST\"\,\"\/ok\"\)/)
   ->content_like(qr/\}else\{r\.open\(\"POST\",\"\/cancel\"\)/)
-  ->content_like(qr/r\.send\("csrf_token="\+x\);v=true\};/)
+  ->content_like(qr/r\.send\("csrf_token="\+x\)/)
+  ->content_like(qr/;v=true\};/)
   ;
 
 $t->get_ok('/alertify/onlycancel')

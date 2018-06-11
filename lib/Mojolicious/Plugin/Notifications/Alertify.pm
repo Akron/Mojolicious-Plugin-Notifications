@@ -10,6 +10,9 @@ use File::Basename;
 has [qw/base_class base_timeout/];
 state $path = '/alertify/';
 
+# TODO:
+#   When confirmation fails: Alert!
+
 # Register plugin
 sub register {
   my ($plugin, $app, $param) = @_;
@@ -52,7 +55,7 @@ sub notifications {
 
   my $csrf = $c->csrf_token;
   sub _ajax ($) {
-    return 'r.open("POST",' . quote($_[0]) . ');r.send("csrf_token="+x);v=true';
+    return 'r.open("POST",' . quote($_[0]) . ');v=true';
   };
 
   # Add notifications
@@ -87,9 +90,10 @@ sub notifications {
       else {
         $js .= 'if(!ok){' . _ajax($param->{cancel}) . '};';
       };
-      $js .= 'if(v){';
-      $js .= 'r.setRequestHeader("Content-type","application/x-www-form-urlencoded");';
-      $js .= 'r.send()';
+      $js .= 'if(v){'."\n";
+      $js .= 'r.setRequestHeader("Content-type","application/x-www-form-urlencoded");'."\n";
+      $js .= 'r.send("csrf_token="+x);'."\n";
+      # $js .= 'r.send()'."\n";
       $js .= '}},' . quote('notify notify-' . $_->[0]) . ");\n";
     }
 
