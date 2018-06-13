@@ -31,12 +31,17 @@ get '/damn' => sub {
   return $c->render(text => ($c->notifications('alertify') || 'nope'));
 };
 
+get '/damnstyle' => sub {
+  my $c = shift;
+  return $c->render(text => ($c->notifications('alertify', 'bootstrap') || 'nope'));
+};
 
 get '/' => sub {
   my $c = shift;
   $c->notify(warn => 'flasherror');
   return $c->redirect_to('/damn');
 };
+
 
 $t->get_ok('/')->status_is(302)->content_is('');
 $t->ua->max_redirects(1);
@@ -45,6 +50,7 @@ $t->ua->max_redirects(0);
 $t->get_ok('/')->status_is(302)->content_is('');
 $t->get_ok('/damn')->status_is(200)->content_like(qr/flasherror/);
 $t->get_ok('/damn')->status_is(200)->content_is('nope');
+$t->get_ok('/damnstyle')->content_is('nope');
 
 
 $co->notify(warn => 'test');

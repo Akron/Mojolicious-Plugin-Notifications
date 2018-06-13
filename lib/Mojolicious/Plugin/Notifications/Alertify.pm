@@ -36,6 +36,8 @@ sub register {
 sub notifications {
   my ($self, $c, $notify_array, $rule, @post) = @_;
 
+  return unless $notify_array->size;
+
   my $theme = shift @post // $self->base_class;
 
   my $js = '';
