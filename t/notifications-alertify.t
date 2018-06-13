@@ -26,11 +26,11 @@ like($notes, qr/notify notify-error/, 'Notification is fine');
 like($notes, qr/That&#39;s an error/, 'Notification is fine');
 ok(!$co->notifications('alertify'), 'No notifications');
 
-# $c->include_notification_center
 get '/damn' => sub {
   my $c = shift;
-  return $c->render(text => $c->notifications('alertify') || 'nope');
+  return $c->render(text => ($c->notifications('alertify') || 'nope'));
 };
+
 
 get '/' => sub {
   my $c = shift;
@@ -55,8 +55,6 @@ $co->notify(trial => { timeout => 23 } => q/That's <an error/);
 my $string = $co->notifications('alertify' => 'bootstrap', -no_include);
 # Test this using Mojo::JSON::Pointer
 like($string, qr/\"That\'s an error\",\"error\",2000/, 'JSON');
-done_testing;
-__END__
 like($string, qr/log\(\"That\'s \<an error\",\"success\"/, 'JSON');
 like($string, qr/log\(\"That\'s \<an error\",\"trial\",23/, 'JSON');
 

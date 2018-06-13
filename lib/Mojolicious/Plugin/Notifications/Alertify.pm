@@ -50,9 +50,9 @@ sub notifications {
 
   # Start JavaScript snippet
   $js .= qq{<script>//<![CDATA[\n};
-  $js .= 'var x=' . quote($c->csrf_token) . ';';
   my $noscript = "<noscript>";
 
+  my $first = 0;
   my $csrf = $c->csrf_token;
   sub _ajax ($) {
     return 'r.open("POST",' . quote($_[0]) . ');v=true';
@@ -66,6 +66,8 @@ sub notifications {
 
     # Confirmation
     if ($param && ($param->{ok} || $param->{cancel})) {
+
+      $js .= 'var x=' . quote($c->csrf_token) . ';' unless $first++;
 
       # Set labels
       if ($param->{ok_label} || $param->{cancel_label}) {
@@ -93,7 +95,13 @@ sub notifications {
       $js .= 'if(v){'."\n";
       $js .= 'r.setRequestHeader("Content-type","application/x-www-form-urlencoded");'."\n";
       $js .= 'r.send("csrf_token="+x);'."\n";
-      # $js .= 'r.send()'."\n";
+
+      # Alert if callback fails to respond
+      $js .= 'r.onreadystatechange=function(){' .
+        'if(this.readyState==4&&this.status!==200){' .
+        'alertify.log(this.status?this.status+": "+this.statusText:"Connection Error",'.
+        '"error")}}'."\n";
+
       $js .= '}},' . quote('notify notify-' . $_->[0]) . ");\n";
     }
 

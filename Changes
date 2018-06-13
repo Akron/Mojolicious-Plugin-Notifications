@@ -1,6 +1,7 @@
-1.03 2018-06-08
+1.03 2018-06-13
         - Introduced 'confirmation' types.
         - Added csrf_token to confirmation routes.
+        - Notify on error in alertify
 
 1.02 2018-05-30
         - Introduced notify_html() function.
