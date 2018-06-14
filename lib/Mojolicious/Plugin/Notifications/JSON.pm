@@ -27,7 +27,7 @@ sub notifications {
     foreach (@$notify_array) {
 
       # Confirmation message
-      if (ref $_->[1] && ($_->[1]->{ok} || $_->[1]->{cancel})) {
+      if (ref $_->[1] && ref $_->[1] eq 'HASH' && ($_->[1]->{ok} || $_->[1]->{cancel})) {
         my $param = $_->[1];
 
         my $opt = {};
@@ -48,12 +48,12 @@ sub notifications {
           };
         };
 
-        push @msgs, [$_->[0], $_->[-1], $opt];
+        push @msgs, [$_->[0], ''.$_->[-1], $opt];
       }
 
       # Normal notification
       else {
-        push(@msgs, [$_->[0], $_->[-1]]);
+        push(@msgs, [$_->[0], ''.$_->[-1]]);
       };
     };
 

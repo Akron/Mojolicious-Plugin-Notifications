@@ -7,17 +7,17 @@ use Scalar::Util qw/blessed/;
 our @EXPORT_OK = ('notify_html');
 
 # TODO:
-#   Only use xml_escape unless it is a Mojo::ByteStream object
+#   Make the form have a class instead of the button!
 
 # Exportable function
 sub notify_html {
   my $c = shift if blessed $_[0] && $_[0]->isa('Mojolicious::Controller');
   my $type = shift;
-  my $param = shift if ref $_[0];
+  my $param = shift if ref $_[0] && ref $_[0] eq 'HASH';
   my $msg = pop;
 
   my $str = qq{<div class="notify notify-$type">};
-  $str .= xml_escape($msg);
+  $str .= blessed $msg && $msg->isa('Mojo::ByteStream') ? $msg : xml_escape($msg);
 
   # Check for confirmation
   if ($param) {

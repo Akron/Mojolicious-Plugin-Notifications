@@ -10,9 +10,6 @@ use File::Basename;
 has [qw/base_class base_timeout/];
 state $path = '/alertify/';
 
-# TODO:
-#   When confirmation fails: Alert!
-
 # Register plugin
 sub register {
   my ($plugin, $app, $param) = @_;

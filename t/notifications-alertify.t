@@ -2,6 +2,7 @@
 use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
+use Mojo::ByteStream 'b';
 
 my $t = Test::Mojo->new;
 
@@ -18,12 +19,14 @@ ok(!$co->notifications('alertify'), 'No alert');
 $co->notify(warn => 'warning');
 $co->notify(error => q/That's an error/);
 $co->notify(success => q/That's <a success/);
+$co->notify(success => b('That\'s a bytestream'));
 
 my $notes = $co->notifications('alertify');
 like($notes, qr/warn.+?error.+?succes/s, 'Notification is fine');
 like($notes, qr/noscript/s, 'Notification is fine');
 like($notes, qr/notify notify-error/, 'Notification is fine');
 like($notes, qr/That&#39;s an error/, 'Notification is fine');
+like($notes, qr/That\'s a bytestream/);
 ok(!$co->notifications('alertify'), 'No notifications');
 
 get '/damn' => sub {
