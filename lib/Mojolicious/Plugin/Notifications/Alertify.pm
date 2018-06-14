@@ -1,14 +1,20 @@
 package Mojolicious::Plugin::Notifications::Alertify;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 use Mojolicious::Plugin::Notifications::HTML qw/notify_html/;
+use Exporter 'import';
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/xml_escape quote/;
 use Mojo::JSON qw/decode_json encode_json/;
+use Scalar::Util qw/blessed/;
 use File::Spec;
 use File::Basename;
 
+our @EXPORT_OK = ('notify_alertify');
+
 has [qw/base_class base_timeout/];
 state $path = '/alertify/';
+
+use constant DEFAULT_TIMEOUT => 5000;
 
 # Register plugin
 sub register {
@@ -16,7 +22,7 @@ sub register {
 
   # Set config
   $plugin->base_class(   $param->{base_class}   // 'default' );
-  $plugin->base_timeout( $param->{base_timeout} // 5000 );
+  $plugin->base_timeout( $param->{base_timeout} // DEFAULT_TIMEOUT );
 
   $plugin->scripts($path . 'alertify.min.js');
   $plugin->styles(
@@ -28,6 +34,72 @@ sub register {
   push @{$app->static->paths},
     File::Spec->catdir( File::Basename::dirname(__FILE__), 'Alertify' );
 };
+
+
+# Exportable function
+sub notify_alertify {
+  my $c = shift if blessed $_[0] && $_[0]->isa('Mojolicious::Controller');
+  my $type = shift;
+  my $param = shift;
+  my $msg = pop;
+
+  state $ajax = sub {
+    return 'r.open("POST",' . quote($_[0]) . ');v=true';
+  };
+
+  my $js = '';
+
+  # Confirmation
+  if ($param->{ok} || $param->{cancel}) {
+
+    $js .= 'var x=' . quote($c->csrf_token) . ';' if $c;
+
+    # Set labels
+    if ($param->{ok_label} || $param->{cancel_label}) {
+      $js .= 'alertify.set({labels:{';
+      $js .= 'ok:'.quote($param->{ok_label} // 'OK') . ',' ;
+      $js .= 'cancel:'.quote($param->{cancel_label} // 'Cancel');
+      $js .= "}});\n";
+    };
+
+    # Create confirmation
+    $js .= 'alertify.confirm(' . quote($msg);
+    $js .= ',function(ok){';
+    $js .= 'var r=new XMLHttpRequest();var v;';
+
+    if ($param->{ok} && $param->{cancel}) {
+      $js .= 'if(ok){'. $ajax->($param->{ok}) .
+        '}else{' . $ajax->($param->{cancel}) . '};';
+    }
+    elsif ($param->{ok}) {
+      $js .= 'if(ok){' . $ajax->($param->{ok}) . '};';
+    }
+    else {
+      $js .= 'if(!ok){' . $ajax->($param->{cancel}) . '};';
+    };
+    $js .= 'if(v){';
+    $js .= 'r.setRequestHeader("Content-type","application/x-www-form-urlencoded");';
+    $js .= 'r.send("csrf_token="+x);' if $c;
+
+    # Alert if callback fails to respond
+    $js .= 'r.onreadystatechange=function(){' .
+      'if(this.readyState==4&&this.status!==200){' .
+      'alertify.log(this.status?this.status+": "+this.statusText:"Connection Error",'.
+      '"error")}}';
+
+    $js .= '}},' . quote('notify notify-' . $type) . ");\n";
+  }
+
+  # Normal alert
+  else {
+    $js .= 'alertify.log(' . quote($msg);
+    $js .= ',' . quote($type) . ',';
+    $js .= $param->{timeout};
+    $js .= ");\n";
+  };
+  return $js;
+};
+
 
 # Notification method
 sub notifications {
@@ -49,73 +121,25 @@ sub notifications {
 
   # Start JavaScript snippet
   $js .= qq{<script>//<![CDATA[\n};
+
   my $noscript = "<noscript>";
 
-  my $first = 0;
   my $csrf = $c->csrf_token;
-  sub _ajax ($) {
-    return 'r.open("POST",' . quote($_[0]) . ');v=true';
-  };
 
   # Add notifications
   foreach (@$notify_array) {
 
-    # Get parameter
-    my $param = $_->[1] if scalar @{$_} == 3;
-
-    # Confirmation
-    if ($param && ($param->{ok} || $param->{cancel})) {
-
-      $js .= 'var x=' . quote($c->csrf_token) . ';' unless $first++;
-
-      # Set labels
-      if ($param->{ok_label} || $param->{cancel_label}) {
-        $js .= 'alertify.set({labels:{';
-        $js .= 'ok:'.quote($param->{ok_label} // 'OK') . ',' ;
-        $js .= 'cancel:'.quote($param->{cancel_label} // 'Cancel');
-        $js .= "}});\n";
-      };
-
-      # Create confirmation
-      $js .= 'alertify.confirm(' . quote($_->[-1]);
-      $js .= ',function(ok){';
-      $js .= 'var r=new XMLHttpRequest();var v;';
-
-      if ($param->{ok} && $param->{cancel}) {
-        $js .= 'if(ok){'. _ajax($param->{ok}) .
-          '}else{' . _ajax($param->{cancel}) . '};';
-      }
-      elsif ($param->{ok}) {
-        $js .= 'if(ok){' . _ajax($param->{ok}) . '};';
-      }
-      else {
-        $js .= 'if(!ok){' . _ajax($param->{cancel}) . '};';
-      };
-      $js .= 'if(v){'."\n";
-      $js .= 'r.setRequestHeader("Content-type","application/x-www-form-urlencoded");'."\n";
-      $js .= 'r.send("csrf_token="+x);'."\n";
-
-      # Alert if callback fails to respond
-      $js .= 'r.onreadystatechange=function(){' .
-        'if(this.readyState==4&&this.status!==200){' .
-        'alertify.log(this.status?this.status+": "+this.statusText:"Connection Error",'.
-        '"error")}}'."\n";
-
-      $js .= '}},' . quote('notify notify-' . $_->[0]) . ");\n";
+    # Set timeout
+    # There is a parameter hash
+    if (ref $_->[1] && ref $_->[1] eq 'HASH') {
+      $_->[1]->{timeout} //= $self->base_timeout
     }
 
-    # Normal alert
+    # There is no parameter
     else {
-      $js .= 'alertify.log(' . quote($_->[-1]);
-      $js .= ',' . quote($_->[0]) . ',';
-      if ($param) {
-        $js .= $param->{timeout} // $self->base_timeout;
-      }
-      else {
-        $js .= $self->base_timeout
-      };
-      $js .= ");\n";
+      splice(@$_, 1, 0, { timeout => $self->base_timeout })
     };
+    $js .= notify_alertify($c, @$_);
     $noscript .= notify_html($c, @$_);
   };
 
@@ -245,6 +269,31 @@ stylesheet tag for the inclusion of the CSS, append C<-no_css>.
 All notifications are also rendered in a C<E<lt>noscript /E<gt>> tag,
 following the notation described in the
 L<HTML|Mojolicious::Plugin::Notifications::HTML> engine.
+
+
+=head1 EXPORTABLE FUNCTIONS
+
+=head2 notify_alertify
+
+  use Mojolicious::Plugin::Notifications::Alertify qw/notify_alertify/;
+
+  notify_alertify(warn => { timeout => 5000 } => 'This is a warning')
+  # alertify.log("This is a warning","warn",5000);
+
+Returns the notification as an L<Alertify.js|http://fabien-d.github.io/alertify.js/>
+JavaScript snippet.
+
+Accepts the controller as an optional first parameter,
+the notification type, a hash reference with parameters,
+and the message. In case the parameters include C<ok> or C<cancel> routes,
+a confirmation notification is used.
+
+If the first parameter is a L<Mojolicious::Controller> object,
+and the notification is a confirmation, the requests will have
+a L<csrf_token|Mojolicious::Plugin::TagHelpers/csrf_token>
+parameter to validate.
+
+B<Confirmation is EXPERIMENTAL!>
 
 
 =head1 SEE ALSO

@@ -4,6 +4,15 @@ use Test::More;
 use Mojolicious::Lite;
 use Mojo::ByteStream 'b';
 
+use_ok('Mojolicious::Plugin::Notifications::Alertify', 'notify_alertify');
+
+is(notify_alertify('info',{ timeout => 5000 },'test'), 'alertify.log("test","info",5000);'."\n");
+
+my $confirm = notify_alertify('info',{ ok => 'http://confirm', cancel => 'http://cancel' },'test');
+like($confirm, qr/alertify\.confirm\(/);
+like($confirm, qr/r\.open\(\"POST\",\"http:\/\/confirm\"\);v=true/);
+like($confirm, qr/r\.open\(\"POST\",\"http:\/\/cancel\"\);v=true/);
+
 my $t = Test::Mojo->new;
 
 my $app = $t->app;

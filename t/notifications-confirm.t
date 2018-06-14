@@ -43,7 +43,6 @@ app->log->on(
     };
   });
 
-
 get '/:notetype/simple' => sub {
   my $c = shift;
   $c->notify(warn => {
@@ -86,7 +85,6 @@ app->plugin(Notifications => {
   JSON => 1,
   Humane => 1
 });
-
 
 # Test HTML response
 $t->get_ok('/html/simple')
