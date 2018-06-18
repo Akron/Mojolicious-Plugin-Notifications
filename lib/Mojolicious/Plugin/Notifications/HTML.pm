@@ -9,6 +9,13 @@ our @EXPORT_OK = ('notify_html');
 # TODO:
 #   Make the form have a class instead of the button!
 
+# TODO:
+#   Maybe make the buttons be part of a single form.
+
+# TODO:
+#   Add a redirect URL with ClosedRedirect, so it's ensured
+#   a redirect won't be misused.
+
 # Exportable function
 sub notify_html {
   my $c = shift if blessed $_[0] && $_[0]->isa('Mojolicious::Controller');

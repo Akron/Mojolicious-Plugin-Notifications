@@ -22,6 +22,9 @@ post '/cancel' => sub {
   shift->render(text => 'Canceled!')
 } => 'cancel';
 
+get '/confirm' => sub {
+  shift->render(text => 'Please confirm');
+} => 'confirm';
 
 helper 'reply.notifications' => sub {
   my $c = shift;
@@ -59,6 +62,19 @@ get '/:notetype/labels' => sub {
     ok_label => 'Fine!',
     cancel => $c->url_for('cancel'),
     cancel_label => 'Nope!'
+  } => q/That's a warning/);
+  $c->reply->notifications;
+};
+
+get '/:notetype/confirmroute' => sub {
+  my $c = shift;
+  $c->notify(warn => {
+    ok => $c->url_for('ok'),
+    ok_label => 'Fine!',
+    cancel => $c->url_for('cancel'),
+    cancel_label => 'Nope!',
+    confirm => $c->url_for('confirm'),
+    confirm_label => 'confirm_route'
   } => q/That's a warning/);
   $c->reply->notifications;
 };
@@ -103,6 +119,16 @@ $t->get_ok('/html/labels')
   ->text_is('div.notify form[action$=cancel][method="post"] > button', 'Nope!')
   ->element_exists('div.notify form[action$=cancel] > input[type=hidden][name=csrf_token]')
   ;
+
+
+$t->get_ok('/html/confirmroute')
+  ->status_is(200)
+  ->text_is('div.notify.notify-warn', 'That\'s a warning')
+  ->text_is('div.notify form[action$=ok][method="post"] > button', 'Fine!')
+  ->text_is('div.notify form[action$=cancel][method="post"] > button', 'Nope!')
+  ->element_exists('div.notify form[action$=cancel] > input[type=hidden][name=csrf_token]')
+  ;
+
 
 $t->get_ok('/html/onlycancel')
   ->status_is(200)
@@ -201,6 +227,18 @@ $t->get_ok('/json/labels')
   ->json_is('/notifications/0/2/Fine!/url', "/ok")
   ;
 
+$t->get_ok('/json/confirmroute')
+  ->json_is('/text', 'example')
+  ->json_is('/notifications/0/0', 'warn')
+  ->json_is('/notifications/0/1', "That's a warning")
+  ->json_is('/notifications/0/2/confirm_route/method', "GET")
+  ->json_is('/notifications/0/2/confirm_route/url', "/confirm")
+  ->json_hasnt('/notifications/0/2/ok')
+  ->json_hasnt('/notifications/0/2/cancel')
+  ->json_hasnt('/notifications/0/2/Nope!')
+  ->json_hasnt('/notifications/0/2/Fine!')
+  ;
+
 $t->get_ok('/json/onlycancel')
   ->json_is('/text', 'example')
   ->json_is('/notifications/0/0', 'warn')
@@ -209,6 +247,7 @@ $t->get_ok('/json/onlycancel')
   ->json_is('/notifications/0/2/cancel/url', "/cancel")
   ->json_hasnt('/notifications/0/2/ok')
   ;
+
 
 unlike($loglines, qr/Notifications/);
 
