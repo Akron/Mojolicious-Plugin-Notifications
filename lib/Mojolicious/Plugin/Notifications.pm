@@ -346,7 +346,7 @@ compatible.
 =head1 HINTS
 
 As flash information is stored in the session, notifications may be lost
-in case the session expires using C<session(expires => 1)>.
+in case the session expires using C<session(expires =E<gt> 1)>.
 
 
 =head1 AVAILABILITY
