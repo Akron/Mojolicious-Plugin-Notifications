@@ -5,6 +5,7 @@ sandbox
 examples
 example
 lib/Test
+lib/Mojolicious/Plugin/Notifications/AlertifyCSP.pm
 public
 todo.org
 create-cpan.pl
