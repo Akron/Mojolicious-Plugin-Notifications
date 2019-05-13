@@ -1,10 +1,15 @@
 #!/usr/bin/env perl
 use Test::Mojo::Session;
 use Test::More;
+use Mojo::File qw/tempfile/;
 use Mojolicious::Lite;
 use utf8;
 
 use_ok('Mojolicious::Plugin::Notifications::HTML', 'notify_html');
+
+app->log->level('warn');
+
+app->log->path(tempfile);
 
 is(notify_html('announce',{
   ok => 'http://example.com/ok',
