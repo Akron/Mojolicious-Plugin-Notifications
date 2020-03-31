@@ -1,4 +1,4 @@
-package Plugin::MyEngine;
+package ExampleApp::Plugin::MyEngine;
 use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/xml_escape quote/;
