@@ -185,7 +185,7 @@ in case the session expires using C<session(expires =E<gt> 1)>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2019, L<Nils Diewald|https://nils-diewald.de/>.
+Copyright (C) 2014-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 Part of the code was written at the
 L<Mojoconf 2014|http://www.mojoconf.org/mojo2014/> hackathon.
